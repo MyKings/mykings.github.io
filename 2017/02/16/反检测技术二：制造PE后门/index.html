@@ -59,77 +59,107 @@
         <!-- -->
         <div class="column three-fourths">
             <article class="article-content markdown-body">
-                <p>本文主要说明在网络攻防演习中红队如何在PE（Portable Executable）文件中放置后门的几种方法。为了让读者能够充分掌握本文的内容，您至少需要具有中级x86汇编知识，并熟悉调试器与PE文件格式。</p>
+                <p>本文主要讲述在网络攻防演练中红队如何在PE(Portable Executable)文件中放置后门的几种方法。为了让读者能够充分掌握本文的内容，您需要具有中级x86汇编知识，并熟悉调试器与PE文件格式。</p>
 <a id="more"></a>
-<h2 id="1-基本介绍"><a href="#1-基本介绍" class="headerlink" title="1 基本介绍"></a>1 基本介绍</h2><p>Nowadays almost all security researchers, pentesters and malware analysts deal with backdoors in a daily basis, placing a backdoor to a system or specifically to a program is the most popular way for maintaining the access. Majority of this paper’s content will be about methods for implanting backdoors to 32 bit PE files, but since the PE file format is a modified version of Unix COFF (Common Object File Format) the logic behind the methods can be implemented for all other executable binary file types. Also the stealthiness of the implanted backdoor is very important for staying longer in the systems, the methods that will be explained in this paper are prepared according to get the lowest detection rate as possible. Before moving further in this paper reading the first article Introduction To AV &amp; Detection Techniques of Art of Anti Detection article series would be very helpful for understanding the inner workings of AV products and fundamental thinks about anti detection.</p>
-<p>Terminology</p>
-<p>Red Team Pentesting: When used in a hacking context, a red team is a group of white-hat hackers that attack an organization’s digital infrastructure as an attacker would in order to test the organization’s defenses (often known as “penetration testing”).Companies including Microsoft perform regular exercises under which both red and blue teams are utilized. Benefits include challenges to preconceived notions and clarifying the problem state that planners are attempting to mitigate. More accurate understanding can be developed of how sensitive information is externalized and of exploitable patterns and instances of bias.</p>
-<p>Address space layout randomization: (ASLR) is a computer security technique involved in protection from buffer overflow attacks. In order to prevent an attacker from reliably jumping to, for example, a particular exploited function in memory, ASLR randomly arranges the address space positions of key data areas of a process, including the base of the executable and the positions of the stack, heap and libraries.</p>
-<p>Code Caves: A code cave is a piece of code that is written to another process’s memory by another program. The code can be executed by creating a remote thread within the target process. The code cave of a code is often a reference to a section of the code’s script functions that have capacity for the injection of custom instructions. For example, if a script’s memory allows for 5 bytes and only 3 bytes are used, then the remaining 2 bytes can be used to add external code to the script. This is what is referred to as a code cave.</p>
-<p>Checksum: A checksum is a small-sized datum from a block of digital data for the purpose of detecting errors which may have been introduced during its transmission or storage. It is usually applied to an installation file after it is received from the download server. By themselves, checksums are often used to verify data integrity but are not relied upon to verify data authenticity.</p>
-<p>Main Methods</p>
-<p>All the implementations and examples in this paper will be over putty SSH client executable. There are several reason for selecting putty for backdooring practice, one of them is putty client is a native C++ project that uses multiple libraries and windows APIs, another reason is backdooring a SSH client attracts less attention, because of program is already performing TCP connection it will be easier to avoid blue team network monitoring,</p>
-<p>The backdoor code that will be used is Stephen Fever’s reverse TCP meterpreter shellcode from metasploit project. The main goal is injecting the meterpreter shellcode to target PE file without disrupting the actual functionality of the program. Injected shellcode will execute on a new thread and will try to connect to the handler continuously. While doing all these, another goal is keeping the detection score as low as possible.</p>
-<p>The common approach for implanting backdoors in PE files consists of 4 main steps;</p>
-<p>1) Finding available space for backdoor code<br>2) Highjacking execution flow<br>3) Injecting backdoor code<br>4) Restoring execution flow</p>
-<p>In each step there are small details which is the key for implanting consistent, durable and undetectable backdoors.</p>
-<p>Available Space Problem</p>
-<p>Finding available space is the first step that needs to be done, how you select the right space inside PE file to insert backdoor code is very important, the detection score of backdoored file highly depends on how you decide on solving the space problem.There are two main approaches for solving the space problem,</p>
-<p>1) Adding a New Section</p>
-<p>This one has more drawbacks with detection score compared to the other approach but with appending a whole new section there is no space limit for the backdoor code that will be implanted.</p>
-<p>With using a dis assembler or PE editor like LordPE, all PE files can be enlarged with adding a new section header, here is the section table of putty executable, with the help of PE editor, new section “NewSec” added with the size of 1000 bytes,</p>
-<p>While creating a new section, setting the section flags  as “Read/Write/Execute”  is vital for running the backdoor shellcode when PE image mapped on the memory.</p>
-<p>After adding the section header the file size needs to be adjusted, this can be easily achieved with adding null bytes with the size of the section at the end of the file on a hex editor.</p>
-<p>After these operations new empty section is successfully added to the file, running the file after adding a new section is suggested in case of any errors, if the executable is running smoothly the new section is ready to be modified on a debugger.</p>
-<p>Solving the space problem with adding a new section has few drawbacks on anti detection score, almost all AV products recognizes uncommon sections and giving all (Read/Write/Execute) permission to an uncommon section is surely very suspicious.</p>
-<p>Even when adding a empty full permission section to putty executable, it gets flagged as malicious by some AV products.</p>
-<p>2) Code Caves<br>Second approach for solving the space problem is using the code caves of the target executable. Almost all compiled binary files have code caves that can be used when backdooring operations. Using code caves instead of new added sections attracts far less AV product because of using already existing common sections. Also overall size of the PE file will not changed at the end of backdooring process but this method also has few drawbacks.</p>
-<p>The number and size of the code caves varies file to file but generally there is not so much space compared to adding a new section. When using code caves, backdoor code should be trimmed as much as possible. Another drawback is the section flags. Since the execution of the application will be redirected to the cave, the section which contains the cave should have “execute” privileges, even some shellcodes (encoded or obfuscated in a self modifying way) needs also “write” privileges in order to make changes inside the section.</p>
-<p>Usage of multiple code caves will help overcoming the space limitation problem also splitting the backdoor code to pieces will have a positive affect on detection score but unfortunately changing the section privileges will look suspicious. There are few advanced methods that modifies the memory region privileges on runtime in order to avoid changing the section privileges directly, but because of those methods requires custom crafted shellcodes, encodes and IAT parsing techniques, it will be next articles subject.</p>
-<p>With the help of a tool called Cminer it is very easy to enumerate all code caves of a binary file, ./Cminer putty.exe 300 command enumerates the code caves witch is bigger than 300 bytes,</p>
-<p>In this case there are 5 good code caves that can be used. Start address gives the virtual memory address (VMA) of the cave. This is the address of the cave when PE file loaded into memory, file offset is the location address of cave inside the PE file in terms of bytes.</p>
-<p>It seems most of the caves are inside data sections, because of data sections doesn’t have execute privileges section flags, needs to be changed. Backdoor code will be around 400-500 bytes so cave 5 should be more than enough. The start address of selected cave should be saved, after changing the section privileges to R/W/E the first step of backdooring process will be completed. Now it’s time to redirecting the execution.</p>
-<p>Hijacking Execution Flow</p>
-<p>In this step, the goal is redirecting the execution flow to the backdoor code by modifying a instruction from target executable. There is one important detail about selecting the instruction that will be modified. All binary instructions has a size in manner of bytes, in order to jump to the backdoor code address, a long jump will be used which is 5 or 6 bytes. So when patching the binary, the instruction that will be patched needs to be the same size with a long jump instruction, otherwise the previous or next instruction will be corrupted.</p>
-<p>Selecting the right space for redirecting the execution is very important for bypassing the dynamic and sandbox analysis mechanisms of AV products. If redirection occurs directly it will probably be detected at the dynamic analysis phase of AV scanners.</p>
-<p>Hiding Under User Interaction:</p>
-<p>The first things that comes in mind for bypassing sandbox/dynamic analysis phase is delaying the execution of the shellcode or designing sandbox aware shellcodes and trigger mechanisms. But when backdooring, most of the time there is not so much space for adding these kind of extra code inside PE file. Also designing anti detection mechanisms in assembly level languages requires a lot of time and knowledge.</p>
-<p>This method takes advantage of functions that requires user interactions in order to perform operations, redirecting the execution inside such functions will serve as a trigger mechanism for activating the backdoor code only if when a real user operating the program. If this method can be implemented correctly, it will have %100 success rate and it will not increase the backdoor code size.</p>
-<p>The “Open” button on putty executable UI launches a function that checks the validity of the given IP address,</p>
-<p>If the IP address field value is not empty and valid, it launches a connection function that tries to connect the given IP address.</p>
-<p>If client successfully creates a SSH session a new windows pops up and asks for credentials,</p>
-<p>This will be the point that redirection will occur, since no AV product is not advanced enough for replicating this kind of complex usage, the implanted backdoor will not be detected whit automated sandbox and dynamic analysis mechanisms.</p>
-<p>With using basic reverse engineering methods like following strings and string references it will not be hard to find the address of the connection function. After client establishes a connection with the given IP, there is a string “login as: “ printed to the appeared window. This string will help us find the address of the connection function, IDA Pro does a very good job in terms of following the string references.</p>
-<p>For finding the “login as:” string open Views-&gt;Open Subviews-&gt;Strings on IDA</p>
-<p>After finding the string double click on it for going to location, inside data sections IDA finds all the cross references that have made for the strings, with pressing “Ctrl+X” it shows all cross references,</p>
-<p>This reference made inside the function that prints the “login as: ” string,</p>
-<p>This will be the instruction that is going to be patched, before making any changes take note of the instruction. After the execution of the backdoor code it will be used again.</p>
-<p>With changing the PUSH 467C7C instruction to JMP 0x47A478 redirection phase of backdooring process is completed. It is important to take note of the next instruction address. It will be used as returning address after the execution of the backdoor code. Next step will be injecting the backdoor code.</p>
-<p>Injecting Backdoor Code</p>
-<p>While injecting backdoor code the first think that needs to be done is saving the registers before the execution of the backdoor. Every value inside all registers is extremely important for the execution of the program. With placing PUSHAD and PUSHFD instructions at the begging of the code cave all the registers and register flags are stored inside stack. These values will popped back after the execution of the backdoor code so the program can continue execution without any problem.</p>
-<p>As mentioned earlier, the backdoor code that will be used is meterpreter reverse TCP shellcode from metasploit project. But there needs to be few changes inside shellcode. Normally reverse TCP shellcode tries to connect to the handler given number of times and if the connection fails it closes the process by calling a ExitProcess API call.</p>
-<p>The problem here is, if the connection to handler fails the execution of the putty client will stop, with changing few lines of the shellcodes assembly now every time connection fails shellcode will retry to connect to the handler, also size of the shellcode is decreased.</p>
-<p>After making the necessary changes inside assembly code compile it with nasm -f bin stager_reverse_tcp_nx.asm command. Now the reverse TCP shellcode is ready to use, but it will not be placed directly. The goal is executing the shellcode on a new thread. In order to create a new thread instance, there needs to be another shellcode that makes a CreateThread API call that is pointing to reverse TCP shellcode. There is also a shellcode for creating threads inside metasploit project written by Stephen Fever,</p>
-<p>After placing the shellcode bytes inside createthread.asm file in hex format like above, it is ready to be assembled with nasm -f bin createthread.asm command. At this point the shellcode is ready to be inserted to the cave but before inserting the shellcode it should be encoded in order to bypass the static/signature analysis mechanisms of AV products. Because of all encoders inside metasploit project are known by majority of AV products, using custom encoders is highly suggested. This paper will not cover the making of such custom shellcode encoders because it will be yet another article’s subject but using multiple metasploit encoders may also work. After each encoding process uploading the encoded shellcode to virus total in raw format and checking the detection score is suggested. Try every combination until it gets undetected or wait for the next article ⏰.</p>
-<p>After properly encoding the shellcode, it is time for inserting it to the code cave. Select the instruction just under the PUSHFD and press Ctrl+E on immunity debugger, shellcode will be pasted here in hex format.</p>
-<p>With xxd -ps createthread command, print the encoded createthread shellcode in hex format or open the shellcode with a hex editor and copy the hex values. While pasting the hex values to debugger be careful about the byte limit, these patching operations are made with immunity debugger and immunity debugger has a byte limit when pasting to edit code window. It will not paste all of the shellcode, remember the last 2 byte of the pasted shellcode inside edit code window, after pressing the OK button continue pasting the bytes where they end, when all shellcode is pasted to code cave the insertion of the backdoor code is complete.</p>
-<p>Restoring Execution Flow</p>
-<p>After the creation of the backdoor code thread, the program needs to turn back to its ordinary execution, this means EIP should jump back to the function that redirected the execution to the cave. But before jumping back to that function all the saved register should be retrieved.</p>
-<p>With placing POPFD and POPAD instruction at the end of the shellcode, all saved register are poped backed from stack in the same order. After retrieving the registers there is one more think to do before jumping back. It is executing the hijacked instruction, the PUSH 467C7C instruction was replaced with JMP 0x47A478 in order to redirect the execution of the program to the code cave. Now with placing the PUSH 467C7C instruction at the end, hijacked instruction is retrieved also. It is time for returning back to the function that redirected the execution to the cave with inserting JMP 0x41CB73 instruction, at the end the resulting code should look like like below.</p>
-<p>At the end select all patched and inserted instruction, press right-click and Copy to executable. This operation should be done to every instruction that have been modified. When all instructions are copied and saved to file, close the debugger and test out the executable, if executable is running smoothly the backdoor is ready to use.</p>
-<p>Finally, fixing the final file checksum is suggested for preserving authenticity of the file and not to look suspicious, also this may have a effect on decreasing the detection score.</p>
-<p>Conclusion &amp; Preventive Measures</p>
-<p>At the end, when all methods are applied properly, resulting backdoor is fully undetectable. For serving the concept of security in both ways this paper will also point out the counter measures against these backdooring techniques, these measures can be helpful for sysadmins, malware annalists and anti virus/malware product developers.</p>
-<p>1) Section Privilege Controls</p>
-<p>When talking about backdoored files, the section privileges are very important for detecting anomalies, current compilers are never going to set full permissions to a section unless programmer wants it to, especially data section like “.data” or “.rdata” shouldn’t have execute privileges, also code sections like .text shouldn’t have write privileges, these anomalies should be considered as suspicious behavior.</p>
-<p>2) Uncommon Section recognition</p>
-<p>If programmers doesn’t makes any configurations compilers usually creates 5-6 generic types of sections, all security products should posses a mechanism for recognizing uncommon and  suspicious sections, this mechanism can look for the entropy and data alignment inside sections, if a section contains high entropy and unusually ordered data, it should be considered suspicious.</p>
-<p>3) Signature Checks</p>
-<p>This countermeasure is very classic but yet it is the most effective, when downloading a new program or  any piece of executable file, checking the sha1 signature is the safest way for evading backdoored files in your system.</p>
-<p>4) Checking File Checksum</p>
-<p>When there is a difference between the checksum value inside  image header and the actual checksum of the file, this indicates that the file has been modified, security products and sysadmins should check the authenticity of the file with calculating the actual checksum and comparing it with the image header.</p>
-<p>原文地址:<a href="https://pentest.blog/art-of-anti-detection-2-pe-backdoor-manufacturing/" target="_blank" rel="external">https://pentest.blog/art-of-anti-detection-2-pe-backdoor-manufacturing/</a></p>
-<h2 id="原文链接"><a href="#原文链接" class="headerlink" title="原文链接"></a>原文链接</h2><ul>
+<h2 id="1-背景说明"><a href="#1-背景说明" class="headerlink" title="1. 背景说明"></a>1. 背景说明</h2><p>目前几乎所有的安全研究人员、渗透测试人员和恶意软件分析师每天都在处理后门程序，将后门放置到系统或具体某个应用程序是一种较为常见的攻击方式。</p>
+<p>本文的大部分内容是关于将后门植入32位PE文件的方法, 但由于PE文件格式是Unix COFF（Common Object File Format, 通用对象文件格式）的修改版本，所以这些方法也可以用于其他可执行二进制文件类型。</p>
+<p>此外，后门的隐蔽性尤为重要，这里也会分析一些反检测技术的方法。在阅读本文之前，您可以先阅读 <a href="https://pentest.blog/art-of-anti-detection-1-introduction-to-av-detection-techniques/" target="_blank" rel="external">Introduction To AV &amp; Detection Techniques </a>(<a href="http://mykings.me/2016/12/16/%E5%8F%8D%E6%A3%80%E6%B5%8B%E6%8A%80%E6%9C%AF%E4%B9%8B%E5%8F%8D%E7%97%85%E6%AF%92%E6%A3%80%E6%B5%8B/">反检测技术之反病毒检测</a>) , 这将有助于您了解反病毒产品的内部工作原理和反检测技术的基本思想。</p>
+<h2 id="2-专业术语"><a href="#2-专业术语" class="headerlink" title="2. 专业术语"></a>2. 专业术语</h2><p><strong>红队(Red Team Pentesting):</strong> </p>
+<p>在网络攻防演练中，红队是由一群白帽黑客组成，作为攻击者负责攻击组织(通常为蓝队)的数字基础设施，以测试组织的防御能力（通常称为“渗透测试”）。</p>
+<p>其好处体现在先入为主的观念与挑战，发现更多的潜在威胁减少安全问题。其次可更准确地了解敏感信息是如何被泄漏的，以及可利用的模式。目前包括微软在内的一些公司会定期进行红队与蓝队的网络对抗演练。</p>
+<center><img src="/images/pe-backdoor/teams.png" alt=""><br><em>图片译者添加</em><br></center>
+
+
+<p><strong>地址空间布局随机化(ASLR):</strong></p>
+<p><code>ASLR</code> 是一种针对缓冲区溢出的安全保护技术。为了防止攻击者能够直接定位内存中攻击代码位置，<code>ASLR</code> 随机排列进程的关键数据区域的内存地址，如: 可执行文件的基址、栈、堆和库的位置。</p>
+<p><strong>代码洞(Code Caves):</strong> </p>
+<p><code>Code Caves</code>是由另一个程序写入另一个进程的内存的一段代码。这段代码可以通过在目标进程内创建远程线程来执行。代码的<code>Code Caves</code>通常是对代码的脚本函数的一部分的引用，该脚本函数具有注入自定义指令的能力。例如，如果脚本的内存允许5个字节，并且只使用3个字节，则剩余的2个字节可以用于向脚本添加外部代码, 这就是所谓的代码洞。</p>
+<p><strong>校验和(Checksum):</strong> </p>
+<p><code>校验和</code>是来自数字数据块的小尺寸数据，用于检测在其传输或存储期间可能引入的错误。它通常从远端服务器下载到本地接收到之后应用于安装文件。通过自身，校验和通常用于验证数据完整性，但不依赖于验证数据的真实性。</p>
+<blockquote>
+<p>译者注: “校验和” 是冗余校验的一种形式。 它是通过错误检测方法，对经过空间（如通信）或者时间（如计算机存储）传送的数据的完整性进行检查的一种简单方法。计算机领域常见的校验和的方法有: CRC、MD5、SHA家族等。</p>
+</blockquote>
+<h2 id="3-基本流程"><a href="#3-基本流程" class="headerlink" title="3. 基本流程"></a>3. 基本流程</h2><p>本文中将通过 <a href="http://www.putty.org/" target="_blank" rel="external">putty.exe</a> 这个SSH客户端来做示例演示。这里使用<code>putty</code>的主要原因有如下几个:</p>
+<ul>
+<li><code>putty</code> 客户端是一个使用多个库和 Windows API 的本地 C++ 项目;</li>
+<li>SSH客户端的后门吸引较少关注，因为程序主要就是执行TCP连接，这将更容易避免蓝色团队网络监控。</li>
+</ul>
+<p>这个后门代码将使用 <a href="https://github.com/rapid7/metasploit-framework" target="_blank" rel="external"><code>metasploit</code></a> 项目中 Stephen Fever’s 开发的TCP反向链接的 <a href="https://github.com/rapid7/metasploit-framework/blob/master/external/source/shellcode/windows/x86/src/stager/stager_reverse_tcp_nx.asm" target="_blank" rel="external"><code>ShellCode</code></a>。 主要将 <code>ShellCode</code> 注入目标PE文件中，并且不影响程序的正常功能。注入的 <code>ShellCode</code> 将在一个新的线程上执行，并不断地尝试连接到控制端。完成以上目标后我们还要做一些免杀, 来减少被检测到的风险。</p>
+<p>大致流程主要分以下四个步骤:</p>
+<ul>
+<li>完成可用空间的后门代码(添加区段)</li>
+<li>劫持执行流程</li>
+<li>注入后门代码</li>
+<li>恢复执行流程</li>
+</ul>
+<p>在每一个步骤中都有一些关键操作, 这些细节保证了后门的隐蔽与降低被检测到的风险。</p>
+<h2 id="4-可用空间问题"><a href="#4-可用空间问题" class="headerlink" title="4. 可用空间问题"></a>4. 可用空间问题</h2><p>第一步我们需要找到可用空间，如何在PE文件中选择合适的空间来插入后门代码非常重要, 这将影响到后门被检测到的风险系数。 有如下两种方法解决空间大小问题:</p>
+<h3 id="4-1-添加新区段"><a href="#4-1-添加新区段" class="headerlink" title="4.1 添加新区段"></a>4.1 添加新区段</h3><p>与其他方法相比，这种方法容易被检测引擎检测到，但另一个好处是附加了一个新的区段，对于将被植入的后门代码没有空间限制。</p>
+<p>使用一个汇编程序或PE编辑器(如<code>LordPE</code>)，所有的PE文件可以添加一个新的段头，这是 <code>putty</code> 可执行文件的节表，借助PE编辑器添加了一个 “<code>NewSec</code>“ 区段, 大小为 1000 字节，</p>
+<p><img src="/images/pe-backdoor/sectiontable.png" alt=""></p>
+<p>当创建一个新的区段时，将段标志设置为 “读/写/执行” 对于当PE映像映射到内存时运行后门 <code>ShellCode</code> 至关重要。</p>
+<p><img src="/images/pe-backdoor/sectionflags.png" alt=""></p>
+<p>在添加段头之后，需要调整文件大小，这可以通过在十六进制编辑器中添加空文件和文件末尾的段大小来实现。</p>
+<p><img src="/images/pe-backdoor/hexedit.png" alt=""></p>
+<p>在这些操作之后，新的空段被成功地添加到PE文件中，运行修改后的 <code>putty</code> 文件，如果正常运行, 则新段可以在调试器上被修改。</p>
+<p><img src="/images/pe-backdoor/newsec.png" alt=""></p>
+<p>为了解决空间问题，我们添加一个新的区段，但是几乎所有的AV产品都能识别不常见的区段，同时给一个不常见的区段所有（读/写/执行）权限肯定是非常可疑的。即使向putty可执行文件添加空的完整权限，也会被某些AV产品标记为恶意。</p>
+<p><img src="/images/pe-backdoor/VirusTotal.png" alt=""></p>
+<h3 id="4-2-代码洞-Code-Caves"><a href="#4-2-代码洞-Code-Caves" class="headerlink" title="4.2 代码洞(Code Caves)"></a>4.2 代码洞(Code Caves)</h3><p>解决空间问题的第二种方法是使用目标可执行文件的<code>Code Caves</code>。几乎所有编译的二进制文件都有<code>Code Caves</code>，可以在进行后门操作时使用。使用<code>Code Caves</code>而不是新添加的区段的方法将降低被AV产品检测的风险，因为使用已经存在的公共部分。此外，PE文件的总体大小在添加后门结束时不会被改变，但是该方法也具有缺点。</p>
+<p><code>Code Caves</code>的数量和大小根据文件的不同而不同，与添加区段比通常没有太多的空间。当使用<code>Code Caves</code>时，后门代码应尽可能短小。另一个缺点是段标志, 由于应用程序的执行将被重定向到 Caves，包含 Caves 的部分应该具有 “execute” 权限，甚至一些shellcode（以自修改的方式编码或混淆）也需要 “write” 权限，以便进行更改里面的区段。</p>
+<p>使用多个<code>Code Caves</code>将有助于克服空间限制问题，也将后门代码分割为块同时降低了被AV检测的风险，但不幸的是更改段特权将看起来可疑。有一些高级方法可以修改运行时的内存区域权限，来避免直接更改段权限，但由于这些方法需要定制的 <code>ShellCode</code> 编码和IAT解析技术，它将在下一篇文章中来介绍。</p>
+<p>借助于一个名为<code>Cminer</code>的工具，很容易枚举二进制文件的所有代码洞，<code>./Cminer putty.exe 300</code> 命令枚举<code>Code Caves</code>大于300字节。</p>
+<p><img src="/images/pe-backdoor/cminer1.png" alt=""></p>
+<p>在这种情况下，有5个好的<code>Code Caves</code>可以使用。起始地址给出了<code>Caves</code>的虚拟内存地址（VMA）。这是<code>Caves</code>的地址，当PE文件加载到内存中时，文件偏移量是以字节为单位的PE文件内的<code>Caves</code>地址。</p>
+<p><img src="/images/pe-backdoor/cminer2.png" alt=""></p>
+<p>看来大部分<code>Caves</code>都在数据段内，因为数据段没有执行特权段标志, 这里需要更改。后门代码将在400-500字节左右，所以5个<code>Caves</code>应该是足够的。<code>Caves</code>的起始地址应该被保存，在将段特权更改为R/W/E后，第一步的后门过程就完成了。 </p>
+<p>下面开始需要重定向执行的时候了。</p>
+<h2 id="5-劫持执行流程"><a href="#5-劫持执行流程" class="headerlink" title="5. 劫持执行流程"></a>5. 劫持执行流程</h2><p>在此步骤中，我们目的是通过修改目标可执行文件的指令将执行流重定向到后门代码。这里有一个关于选择将被修改的指令重要细节, 所有二进制指令具有字节大小，为了跳转到后门代码地址，将使用5或6字节的长跳跃。 因此，当修补二进制时，将被修补的指令需要与长跳转指令的大小相同，否则上一条或下一条指令将被破坏。</p>
+<p>选择适当的空间来重定向执行对于绕过AV产品的动态检测和沙箱分析机制是非常重要的。如果直接发生重定向，则可能在AV的动态扫描分析阶段就被检测到。</p>
+<p><strong>隐藏在用户交互下：</strong></p>
+<p>绕过沙盒与动态分析阶段的第一件事是延迟<code>ShellCode</code>的执行或设计沙箱感知和触发机制。 但在添加后门时，大多数时候没有这么多的空间用于在PE文件中添加这些额外的代码。在汇编级语言中设计防检测机制这需要大量的时间和知识。</p>
+<p>该方法主要是利用与用户交互来执行操作的功能, 作为一个触发机制，当一个用户操作程序时激活后门代码。如果这个方法可以正确实现，它将有100%的成功率，而且不会增加后门代码的大小。</p>
+<p>在<code>putty</code>启动后的界面中, 点击 “Open” 按钮会启动一个检查IP地址是否有效的功能。</p>
+<p><img src="/images/pe-backdoor/putty.png" alt=""></p>
+<p>如果IP地址字段值不为空并且有效，则它启动尝试连接给定IP地址的连接功能。如果客户端成功创建SSH会话，将弹出一个新窗口并请求凭据，</p>
+<p><img src="/images/pe-backdoor/puttyLogin.png" alt=""></p>
+<p>这将是重定向发生的点，因为AV产品不能够复制这种复杂的环境，植入的后门将不会被自动化沙盒和动态分析机制检测到。</p>
+<p>使用基本的逆向方法，搜索下面的字符串和字符串引用，将不难找到连接函数的地址。客户端建立与给定IP的连接后，有一个字符串 “login as:” 打印到出现的窗口。 这个字符串将帮助我们找到连接函数的地址，<code>IDA Pro</code>在这方面做得很好。</p>
+<p>为了找到 <strong>“login as:”</strong> 字符串, 在<code>IDA</code>上依次打开 <strong>Views-&gt;Open Subviews-&gt;Strings</strong> </p>
+<p><img src="/images/pe-backdoor/idastring.png" alt=""></p>
+<p>找到字符串后，双击转到所在位置，在数据节内部<code>IDA</code>查找所有对字符串的交叉引用，按 “Ctrl+X”，它显示所有交叉引用，这个引用在打印 “login as:” 字符串的函数内部。</p>
+<p><img src="/images/pe-backdoor/Screenshot_2.png" alt=""><br><img src="/images/pe-backdoor/Screenshot_3.png" alt=""></p>
+<p>这将是要修补的指令，在进行任何更改之前，请注意上下文的指令。 执行后门代码后，将再次使用。</p>
+<p><img src="/images/pe-backdoor/Screenshot_4.png" alt=""></p>
+<p>通过将<code>PUSH 467C7C</code>指令改为<code>JMP 0x47A478</code>，完成后门过程的重定向阶段。 重要的是注意下一个指令地址。它将在执行后门代码后用作返回地址。</p>
+<p>接下来将是注入后门代码的环节。</p>
+<h2 id="6-注入后门代码"><a href="#6-注入后门代码" class="headerlink" title="6. 注入后门代码"></a>6. 注入后门代码</h2><p>在注入后门代码时，首先需要做的是在执行后门之前保存寄存器中的内容。所有寄存器中的每个值对于程序的执行是非常重要的。通过在代码的OEP(程序入口点)放置<code>PUSHED</code>和<code>PUSHED</code>指令，所有寄存器内的值和寄存器标志都存储在堆栈中。 这些值将在执行完后门代码之后弹出，以便程序可以继续执行而没有任何问题。</p>
+<p><img src="/images/pe-backdoor/savereg.png" alt=""></p>
+<p>如前所述，使用的后门代码是来自<code>metasploit</code>项目的<code>meterpreter</code>反向TCP <code>ShellCode</code>。但是在<code>ShellCode</code>中需要做少量修改。 通常，反向TCP <code>ShellCode</code>会有尝试连接到处理程序的次数或时间限定，如果连接失败，则通过调用<code>ExitProcess API</code>调用关闭进程。</p>
+<p><img src="/images/pe-backdoor/dmet.png" alt=""></p>
+<p>这是问题的所在，如果连接到处理程序失败，<code>putty</code>客户端的执行将停止。改变几行<code>ShellCode</code>使其每次连接失败时<code>ShellCode</code>将重试连接到处理器，这样也会相应的减少<code>ShellCode</code>的体积。</p>
+<p><img src="/images/pe-backdoor/nmet.png" alt=""></p>
+<p>在汇编代码中进行更改后，使用<code>nasm -f bin stager_reverse_tcp_nx.asm</code>命令进行编译。现在反向的TCP <code>ShellCode</code>已经可以使用了，但是它不会被直接放置, 我们的目标是在新线程上执行<code>ShellCode</code>。<br>为了创建一个新的线程实例，需要另一个<code>ShellCode</code>，使<code>CreateThread</code>API调用指向反向TCP <code>ShellCode</code>。这里使用<code>Metasploit</code>项目中创建线程的<a href="https://github.com/rapid7/metasploit-framework/blob/master/external/source/shellcode/windows/x86/src/single/createthread.asm" target="_blank" rel="external"><code>ShellCode</code></a>。</p>
+<p><img src="/images/pe-backdoor/CreateThread.png" alt=""></p>
+<p>如上, 将 <a href="https://github.com/rapid7/metasploit-framework/blob/master/external/source/shellcode/windows/x86/src/single/createthread.asm" target="_blank" rel="external">createthread.asm</a> 文件中的代码转换为十六进制格式的<code>ShellCode</code>，使用<code>nasm -f bin createthread.asm</code>命令进行编译。在这里，<code>ShellCode</code>准备插入到<code>Caves</code>中，但在插入<code>ShellCode</code>之前，它应该被编码以便绕过AV产品的静态/特征分析机制。因为<code>Metasploit</code>项目中的所有编码器被大多数AV产品所知，所以强烈建议使用自定义编码器。<br>本文不会覆盖这种自定义<code>ShellCode</code>编码器的制作，它将在下一篇文章中介绍到，这里还可以使用多个<code>Metasploit</code>编码器来工作。在每个编码过程完成之后，将编码的<code>ShellCode</code>上传到线上的病毒检测站点，根据检测分数。 尝试每个组合，直到它不被检测到或等待下一篇文章。</p>
+<p>在正确编码<code>ShellCode</code>之后，就可以把它插入<code>Code Caves</code>。选择在<code>PUSHFD</code>下的指令，然后在免调试器上按下 “Ctrl + E”，<code>ShellCode</code>将以十六进制格式粘贴。</p>
+<p><img src="/images/pe-backdoor/Insert.png" alt=""></p>
+<p>使用<code>xxd -ps createthread</code>命令，以十六进制格式打印编码创建线程的<code>ShellCode</code>或使用十六进制编辑器打开<code>ShellCode</code>并复制十六进制值。当将十六进制值粘贴到调试器时，请注意字节限制，这些修补操作是用免试器进行的，免调试器在粘贴到编辑代码窗口时有一个字节限制。 它不会粘贴所有<code>ShellCode</code>，记住粘贴的<code>ShellCode</code>的最后2个字节在编辑代码窗口内，按下OK按钮后继续粘贴字节，当所有<code>ShellCode</code>粘贴到<code>Code Cave</code>时后门代码就插入完了。</p>
+<h2 id="7-恢复执行流程"><a href="#7-恢复执行流程" class="headerlink" title="7. 恢复执行流程"></a>7. 恢复执行流程</h2><p>在创建后门代码线程之后，程序需要恢复到其正常执行流程，这意味着EIP应该跳回到将执行重定向到<code>Cave</code>的函数。但是在跳回到该函数之前，应该检索所有保存的寄存器。</p>
+<p><img src="/images/pe-backdoor/pop.png" alt=""></p>
+<p>通过在<code>ShellCode</code>的末尾放置<code>POPFD</code>和<code>POPAD</code>指令，所有保存的寄存器都以相同的顺序从堆栈中弹出。在检索寄存器后，还有一件事要做，执行被劫持的指令。为了将程序的执行重定向到<code>Code Cave</code>, 我们将<code>PUSH 467C7C</code>指令替换为了<code>JMP 0x47A478</code>。 现在把<code>PUSH 467C7C</code>指令放在最后，被劫持的指令也被检索。现在是返回到通过插入<code>JMP 0x41CB73</code>指令将执行重定向到<code>Cave</code>的函数的时候了，结果代码应该如下图所示。</p>
+<p><img src="/images/pe-backdoor/end.png" alt=""></p>
+<p>最后选择所有修补和插入的指令，按右键单击并复制到可执行文件。此操作应对已修改的每个指令执行。当所有指令被复制并保存到文件时，关闭调试器并测试可执行文件，如果可执行文件运行顺畅，则后门可以使用。</p>
+<p>最后，建议固定最终文件校验和，以保持文件的真实性，而不是看起来可疑，这也可能对降低检测分数有影响。</p>
+<p><img src="/images/pe-backdoor/Screenshot_6.png" alt=""></p>
+<h2 id="8-总结与预防措施"><a href="#8-总结与预防措施" class="headerlink" title="8. 总结与预防措施"></a>8. 总结与预防措施</h2><p>最后，当所有操作都正常完成后，产生的后门是完全不会被检测到的。针对以上的两种代码注入方式，下面给出这些相应技术的对策，这些策略可以帮助系统管理员、恶意软件记录器、反病毒与反恶意软件产品的开发人员。</p>
+<h3 id="8-1-区段特权控制"><a href="#8-1-区段特权控制" class="headerlink" title="8.1 区段特权控制"></a>8.1 区段特权控制</h3><p>当谈论后门文件时，区段的特权对于检测异常是非常重要的，编译器永远不会设置对区段的完全权限，除非开发人员强制添加。特别是像<code>.data</code>或<code>.rdata</code>这样的数据段不应该有执行权限，类似<code>.text</code>的代码段不应该有写权限，这些异常应该被认为是可疑的行为。</p>
+<h3 id="8-2-不常见区段识别"><a href="#8-2-不常见区段识别" class="headerlink" title="8.2 不常见区段识别"></a>8.2 不常见区段识别</h3><p>如果开发人员不进行任何配置, 编译器通常创建5-6个通用类型的区段，所有安全产品应该具有识别不常见和可疑段的机制，这种机制可以寻找段内的熵和数据对齐，如果一个段包含高熵和异常排序的数据，它应该被认为是可疑的。</p>
+<h3 id="8-3-签名检查"><a href="#8-3-签名检查" class="headerlink" title="8.3 签名检查"></a>8.3 签名检查</h3><p>这种对策非常经典，也是最有效的，当下载一个新的程序或任何一块可执行文件，检查sha1签名来验证程序是否被修改。</p>
+<h3 id="8-4-检查文件校验和"><a href="#8-4-检查文件校验和" class="headerlink" title="8.4 检查文件校验和"></a>8.4 检查文件校验和</h3><p>当内部镜像和文件的实际校验和的值之间存在差异时，这表明该文件已被修改过，安全产品和系统管理员应计算实际校验和并与镜像头比较，来检查文件的真实性。</p>
+<p><img src="/images/pe-backdoor/Scan.png" alt=""></p>
+<p><strong>原文地址: <a href="https://pentest.blog/art-of-anti-detection-2-pe-backdoor-manufacturing/" target="_blank" rel="external">https://pentest.blog/art-of-anti-detection-2-pe-backdoor-manufacturing/</a></strong></p>
+<h2 id="9-原文链接"><a href="#9-原文链接" class="headerlink" title="9. 原文链接"></a>9. 原文链接</h2><ul>
 <li><a href="http://NoDistribute.com/result/image/Ye0pnGHXiWvSVErkLfTblmAUQ.png" target="_blank" rel="external">http://NoDistribute.com/result/image/Ye0pnGHXiWvSVErkLfTblmAUQ.png</a></li>
 <li><a href="https://github.com/secretsquirrel/the-backdoor-factory" target="_blank" rel="external">https://github.com/secretsquirrel/the-backdoor-factory</a></li>
 <li><a href="https://www.shellterproject.com/" target="_blank" rel="external">https://www.shellterproject.com/</a></li>
@@ -138,7 +168,7 @@
 <li><a href="https://en.wikipedia.org/wiki/Code_cave" target="_blank" rel="external">https://en.wikipedia.org/wiki/Code_cave</a></li>
 <li><a href="https://en.wikipedia.org/wiki/Checksum" target="_blank" rel="external">https://en.wikipedia.org/wiki/Checksum</a></li>
 </ul>
-<h2 id="译者参考"><a href="#译者参考" class="headerlink" title="译者参考"></a>译者参考</h2><ul>
+<h2 id="10-译者参考"><a href="#10-译者参考" class="headerlink" title="10. 译者参考"></a>10. 译者参考</h2><ul>
 <li><a href="https://ccdcoe.org/publications/LockedShields13_AAR.pdf" target="_blank" rel="external">https://ccdcoe.org/publications/LockedShields13_AAR.pdf</a></li>
 </ul>
 
@@ -146,7 +176,7 @@
             
                 <div class="share">
                     <!--开启分享-->
-<div class="share-component" data-disabled="google,twitter,facebook" data-description="本文主要说明在网络攻防演习中红队如何在PE（Porta..."></div>
+<div class="share-component" data-disabled="google,twitter,facebook" data-description="本文主要讲述在网络攻防演练中红队如何在PE(Porta..."></div>
 
 <script src="/js/share.min.js"></script>
 
@@ -182,7 +212,7 @@
 <div id="post-directory-module">
 	<section class="post-directory">
 		<p><strong class="toc-title">文章目录</strong></p>
-		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-基本介绍"><span class="toc-text">1 基本介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#原文链接"><span class="toc-text">原文链接</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#译者参考"><span class="toc-text">译者参考</span></a></li></ol>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-背景说明"><span class="toc-text">1. 背景说明</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-专业术语"><span class="toc-text">2. 专业术语</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-基本流程"><span class="toc-text">3. 基本流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-可用空间问题"><span class="toc-text">4. 可用空间问题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-添加新区段"><span class="toc-text">4.1 添加新区段</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-代码洞-Code-Caves"><span class="toc-text">4.2 代码洞(Code Caves)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-劫持执行流程"><span class="toc-text">5. 劫持执行流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-注入后门代码"><span class="toc-text">6. 注入后门代码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-恢复执行流程"><span class="toc-text">7. 恢复执行流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-总结与预防措施"><span class="toc-text">8. 总结与预防措施</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#8-1-区段特权控制"><span class="toc-text">8.1 区段特权控制</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-2-不常见区段识别"><span class="toc-text">8.2 不常见区段识别</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-3-签名检查"><span class="toc-text">8.3 签名检查</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-4-检查文件校验和"><span class="toc-text">8.4 检查文件校验和</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-原文链接"><span class="toc-text">9. 原文链接</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-译者参考"><span class="toc-text">10. 译者参考</span></a></li></ol>
 	</section>
 </div>
             

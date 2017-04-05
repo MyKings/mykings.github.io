@@ -99,31 +99,74 @@ WPAPSK=hangyuewifi</code></pre>
 
 <h4 id="1-1-3-proc-kcore"><a href="#1-1-3-proc-kcore" class="headerlink" title="1.1.3 /proc/kcore"></a>1.1.3 /proc/kcore</h4><p>内存的<code>map</code>, 可以直接使用<code>wget</code>下载下来(需要注意这里要把wget进程结束才可以登录)。</p>
 <p><img src="/images/ip-camera/kcore.png" alt=""></p>
-<h3 id="2-区域分布"><a href="#2-区域分布" class="headerlink" title="2 区域分布"></a>2 区域分布</h3><p>先来看一张图全球的分布:</p>
-<p><img src="/images/ip-camera/map.png" alt=""></p>
-<p>可以发现五个国家和地区:</p>
+<h3 id="2-区域分布"><a href="#2-区域分布" class="headerlink" title="2 区域分布"></a>2 区域分布</h3><p>先来看一张使用 <code>ZoomEye</code> 搜索的结果, 可以看到搜索到 <code>315,129</code> 条。</p>
+<p><img src="/images/ip-camera/map_zoomeye.png" alt=""></p>
+<p>通过筛选分析后 <code>11186</code> IP中存在包含wifi密码, 其中覆盖了111个国家和地区。</p>
+<p>这里近分析了中国香港地区的摄像头:</p>
 <ul>
-<li>美国</li>
-<li>德国</li>
-<li>法国</li>
-<li>意大利</li>
-<li>香港</li>
+<li>无wifi密码962个</li>
+<li>WEP加密方式728个</li>
+<li>WPAPSK加密方式9496个</li>
 </ul>
-<p>这里我下载了所有香港的数据进行分析(这个截图是后截图, 漏洞刚报出的时候香港是3398)。</p>
-<p>shodan 导出 3398 条记录, 分析出1180个包含wifi密码:</p>
-<ul>
-<li>无wifi密码65个</li>
-<li>WEP加密方式52个</li>
-<li>WPAPSK加密方式1063个</li>
-</ul>
-<p><a href="/images/ip-camera/hk_wifi_passwd.txt">查询看密码</a></p>
+<p><a href="/images/ip-camera/zoomeye_wifi_passwd.txt">查询看密码</a></p>
 <p><strong>密码类型统计</strong></p>
 <ul>
-<li>存数字 443 个</li>
-<li>存字母 130 个</li>
-<li>字母+数字 493 个 </li>
-<li>含特殊字符 48 个</li>
+<li>存数字 1807 个</li>
+<li>存字母 1405 个</li>
+<li>字母+数字 5585 个 </li>
+<li>含特殊字符 1001 个</li>
 </ul>
+<p><strong>密码用的最多TOP 10</strong></p>
+<table>
+<thead>
+<tr>
+<th>使用次数</th>
+<th style="text-align:left">密码</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>52</td>
+<td style="text-align:left">1234567890</td>
+</tr>
+<tr>
+<td>31</td>
+<td style="text-align:left">12345678</td>
+</tr>
+<tr>
+<td>30</td>
+<td style="text-align:left">0123456789</td>
+</tr>
+<tr>
+<td>21</td>
+<td style="text-align:left">1122334455</td>
+</tr>
+<tr>
+<td>16</td>
+<td style="text-align:left">123456789</td>
+</tr>
+<tr>
+<td>14</td>
+<td style="text-align:left">a1b2c3d4e5</td>
+</tr>
+<tr>
+<td>9</td>
+<td style="text-align:left">jacekbodziuch03071966</td>
+</tr>
+<tr>
+<td>8</td>
+<td style="text-align:left">windowblind</td>
+</tr>
+<tr>
+<td>7</td>
+<td style="text-align:left">1a2b3c4d5e</td>
+</tr>
+<tr>
+<td>7</td>
+<td style="text-align:left">1111111111</td>
+</tr>
+</tbody>
+</table>
 <p><strong>密码长度统计</strong></p>
 <table>
 <thead>
@@ -134,102 +177,62 @@ WPAPSK=hangyuewifi</code></pre>
 </thead>
 <tbody>
 <tr>
-<td>5位</td>
-<td style="text-align:left">6个</td>
-</tr>
-<tr>
-<td>7位</td>
-<td style="text-align:left">1个</td>
-</tr>
-<tr>
 <td>8位</td>
-<td style="text-align:left">474个</td>
+<td style="text-align:left">1862个</td>
 </tr>
 <tr>
 <td>9位</td>
-<td style="text-align:left">89个</td>
+<td style="text-align:left">907个</td>
 </tr>
 <tr>
 <td>10位</td>
-<td style="text-align:left">246个</td>
+<td style="text-align:left">2566个</td>
 </tr>
 <tr>
 <td>11位</td>
-<td style="text-align:left">48个</td>
+<td style="text-align:left">533个</td>
 </tr>
 <tr>
 <td>12位</td>
-<td style="text-align:left">46个</td>
+<td style="text-align:left">839个</td>
 </tr>
 <tr>
 <td>13位</td>
-<td style="text-align:left">99个</td>
+<td style="text-align:left">710个</td>
 </tr>
 <tr>
 <td>14位</td>
-<td style="text-align:left">24个</td>
+<td style="text-align:left">323个</td>
 </tr>
 <tr>
 <td>15位</td>
-<td style="text-align:left">14个</td>
+<td style="text-align:left">227个</td>
 </tr>
 <tr>
 <td>16位</td>
-<td style="text-align:left">25个</td>
+<td style="text-align:left">346个</td>
 </tr>
 <tr>
 <td>17位</td>
-<td style="text-align:left">9个</td>
+<td style="text-align:left">116个</td>
 </tr>
 <tr>
 <td>18位</td>
-<td style="text-align:left">5个</td>
-</tr>
-<tr>
-<td>19位</td>
-<td style="text-align:left">1个</td>
+<td style="text-align:left">112个</td>
 </tr>
 <tr>
 <td>20位</td>
-<td style="text-align:left">4个</td>
-</tr>
-<tr>
-<td>21位</td>
-<td style="text-align:left">2个</td>
-</tr>
-<tr>
-<td>24位</td>
-<td style="text-align:left">6个</td>
-</tr>
-<tr>
-<td>25位</td>
-<td style="text-align:left">1个</td>
-</tr>
-<tr>
-<td>26位</td>
-<td style="text-align:left">10个</td>
-</tr>
-<tr>
-<td>28位</td>
-<td style="text-align:left">1个</td>
-</tr>
-<tr>
-<td>34位</td>
-<td style="text-align:left">1个</td>
-</tr>
-<tr>
-<td>36位</td>
-<td style="text-align:left">1个</td>
-</tr>
-<tr>
-<td>64位</td>
-<td style="text-align:left">1个</td>
+<td style="text-align:left">272个</td>
 </tr>
 </tbody>
 </table>
 <p>看的出大众还是使用8位、10位的密码较多。</p>
 <p><img src="/images/ip-camera/hk.png" alt=""></p>
-<p>最后附上一张图, 红色代表没有密码的wifi, 黄色代表WEP加密方式, 蓝色代表WPAPSK方式</p>
+<p>附上一张香港分析后的图, 红色代表没有密码的wifi, 黄色代表WEP加密方式, 蓝色代表WPAPSK方式。</p>
+<p><img src="/images/ip-camera/map_word.png" alt=""></p>
+<p>这个世界范围内存在摄像头密码泄漏的分布图。</p>
+<p><img src="/images/ip-camera/vul_image.png" alt=""></p>
+<p>这张图示是根据SSID搜索到的一家公司内的IP摄像头截图。</p>
 <h2 id="3-参考链接"><a href="#3-参考链接" class="headerlink" title="3 参考链接"></a>3 参考链接</h2><ul>
 <li><a href="https://www.exploit-db.com/exploits/41236/" target="_blank" rel="external">https://www.exploit-db.com/exploits/41236/</a></li>
 </ul>
