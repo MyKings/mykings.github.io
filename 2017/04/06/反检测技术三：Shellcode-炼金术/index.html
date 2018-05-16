@@ -62,8 +62,8 @@
                 <p>本文将讨论一些基本的<code>Shellcode</code>编码概念，以及汇编中如何设计<code>Encoder/Decoder</code>来绕过<code>EMET</code>等反攻击解决方案的几种方法。为了方便理解本文的内容，读者需要至少具有中级<code>x86</code>汇编知识和对基本文件格式(如<code>COFF</code>和<code>PE</code>)的正确理解。</p>
 <p>以下两篇文章将有助您理解本文中AV产品和术语所使用的基本检测技术的内部原理:</p>
 <ul>
-<li><a href="https://pentest.blog/art-of-anti-detection-1-introduction-to-av-detection-techniques/" target="_blank" rel="external">Art of Anti Detection 1 – Introduction to AV</a></li>
-<li><a href="https://pentest.blog/art-of-anti-detection-2-pe-backdoor-manufacturing/" target="_blank" rel="external">Detection Techniques and Art of Anti Detection 2 – PE Backdoor Manufacturing</a></li>
+<li><a href="https://pentest.blog/art-of-anti-detection-1-introduction-to-av-detection-techniques/" target="_blank" rel="noopener">Art of Anti Detection 1 – Introduction to AV</a></li>
+<li><a href="https://pentest.blog/art-of-anti-detection-2-pe-backdoor-manufacturing/" target="_blank" rel="noopener">Detection Techniques and Art of Anti Detection 2 – PE Backdoor Manufacturing</a></li>
 </ul>
 <p>中文翻译地址:</p>
 <ul>
@@ -121,7 +121,7 @@ mov edx，[fs:eax+48]</code></pre>
 <p>此结构包含导出函数的地址、名称和编号。使用相同大小的计算遍历技术，可以在该结构内获得所需的函数地址，当然导出函数的顺序可能会在每个 Windows 版本中有所不同，在获得函数地址时，应先检查函数的名称在确定函数名称后。</p>
 <p>你可以理解这是关于计算一些 Windows 数据结构的大小并在内存中遍历的方法，这里的难点是如何建立一个可靠的名称比较机制，来选择正确的 DLL 与函数。</p>
 <p>如果你认为<code>PEB</code>解析技术太难以实现，不要担心，有更简单的方法来做到这一点。</p>
-<h2 id="5-Hash-API"><a href="#5-Hash-API" class="headerlink" title="5. Hash API"></a>5. Hash API</h2><p><a href="https://github.com/rapid7/metasploit-framework" target="_blank" rel="external"><code>Metasploit</code></a> 项目中几乎所有的<code>Shellcode</code>都使用一个名为 <a href="https://github.com/rapid7/metasploit-framework/blob/master/external/source/shellcode/windows/x86/src/block/block_api.asm" target="_blank" rel="external">Hash API</a> 的程序集，它是由 Stephen Fewer 编写的一段很优秀的代码，自 2009 年以来，它被大多数 Windows 用于 Metasploit 内的 <code>Shellcode</code>。</p>
+<h2 id="5-Hash-API"><a href="#5-Hash-API" class="headerlink" title="5. Hash API"></a>5. Hash API</h2><p><a href="https://github.com/rapid7/metasploit-framework" target="_blank" rel="noopener"><code>Metasploit</code></a> 项目中几乎所有的<code>Shellcode</code>都使用一个名为 <a href="https://github.com/rapid7/metasploit-framework/blob/master/external/source/shellcode/windows/x86/src/block/block_api.asm" target="_blank" rel="noopener">Hash API</a> 的程序集，它是由 Stephen Fewer 编写的一段很优秀的代码，自 2009 年以来，它被大多数 Windows 用于 Metasploit 内的 <code>Shellcode</code>。</p>
 <p>该模块使得解析 PEB 结构更加容易，它使用基本的 PEB 解析逻辑和一些额外的散列方法来快速找到所需的函数，计算函数和模块名称的 ROR13 散列。</p>
 <p>这个模块的用法很简单，它使用 stdcall 调用约定只区分是在推送依赖的函数参数后，需要 ROR13 散列的函数名和包含该函数的 DLL 名称，在推送所需参数和函数散列后，如前面所说的来解析 PEB 块，并找到模块名称，<br>找到后计算出 ROR13 散列并将其保存到堆栈，然后移动到 DLL 的导出地址表，并计算每个函数名称的 ROR13 散列，计算出每个函数名称 Hash 和模块名称 Hash 的总和，如果匹配到我们正在寻找的 Hash，这意味着找到了所需的函数，最后 Hash API 使用堆栈中传递的参数跳转到找到的函数地址。</p>
 <p>由于此方法的广泛流行与使用，而被一些 AV 产品和反剥削缓解专门针对。甚至一些 AV 产品对 Hash API 使用的 ROR13 哈希值作为识别恶意文件的签名。在操作系统的安全攻防对抗中，Hash API 的使用已经不那么流行，但还有其他的方法可以找到 Windows API 的函数地址，我们仍然可以使用一些编码机制来绕过大部分的 AV 产品。</p>
@@ -290,22 +290,22 @@ GetShellcode:
 <p>还试图检测特定章节和KERNELBASE的MZ / PE标题上的读取尝试，这是一种防止EAT解析技术的非常有效的缓解方法，但是EAT不是唯一包含所需功能地址的结构，导入地址表（IAT）也包含应用程序使用的Win API函数地址，</p>
 <p>如果应用程序也使用所需的功能，可以收集IAT结构内的功能地址，一名网络安全研究员Joshua Pitts最近开发出了一种新的IAT解析方法，它在导入地址表中找到LoadLibraryA和GetProcAddress Windows API函数，在获得这些功能地址后，</p>
 <p>可以提取任何库中的任何函数，他还写了一个名为fido的工具，用于分析Stephen Fewer的Hash API，并用他写的IAT解析代码替代，如果您想了解更多有关此方法的信息，请在此处查看，</p>
-<p><strong>原文地址: <a href="https://pentest.blog/art-of-anti-detection-3-shellcode-alchemy/" target="_blank" rel="external">https://pentest.blog/art-of-anti-detection-3-shellcode-alchemy/</a></strong></p>
+<p><strong>原文地址: <a href="https://pentest.blog/art-of-anti-detection-3-shellcode-alchemy/" target="_blank" rel="noopener">https://pentest.blog/art-of-anti-detection-3-shellcode-alchemy/</a></strong></p>
 <h2 id="9-原文链接"><a href="#9-原文链接" class="headerlink" title="9. 原文链接"></a>9. 原文链接</h2><ul>
-<li><a href="https://msdn.microsoft.com/en-us/library/ms809762.aspx" target="_blank" rel="external">https://msdn.microsoft.com/en-us/library/ms809762.aspx</a></li>
-<li><a href="https://en.wikipedia.org/wiki/Process_Environment_Block" target="_blank" rel="external">https://en.wikipedia.org/wiki/Process_Environment_Block</a></li>
-<li><a href="https://support.microsoft.com/en-us/help/875352/a-detailed-description-of-the-data-execution-prevention-dep-feature-in-windows-xp-service-pack-2,-windows-xp-tablet-pc-edition-2005,-and-windows-server-2003" target="_blank" rel="external">https://support.microsoft.com/en-us/help/875352/a-detailed-description-of-the-data-execution-prevention-dep-feature-in-windows-xp-service-pack-2,-windows-xp-tablet-pc-edition-2005,-and-windows-server-2003</a></li>
-<li><a href="https://en.wikipedia.org/wiki/Portable_Executable" target="_blank" rel="external">https://en.wikipedia.org/wiki/Portable_Executable</a></li>
-<li><a href="https://en.wikipedia.org/wiki/Address_space_layout_randomization" target="_blank" rel="external">https://en.wikipedia.org/wiki/Address_space_layout_randomization</a></li>
-<li><a href="https://en.wikipedia.org/wiki/X86_calling_conventions" target="_blank" rel="external">https://en.wikipedia.org/wiki/X86_calling_conventions</a></li>
-<li><a href="http://www.vividmachines.com/shellcode/shellcode.html" target="_blank" rel="external">http://www.vividmachines.com/shellcode/shellcode.html</a></li>
-<li><a href="https://github.com/secretsquirrel/fido" target="_blank" rel="external">https://github.com/secretsquirrel/fido</a></li>
-<li><a href="https://github.com/rapid7/metasploit-framework/blob/master/external/source/shellcode/windows/x86/src/block/block_api.asm" target="_blank" rel="external">https://github.com/rapid7/metasploit-framework/blob/master/external/source/shellcode/windows/x86/src/block/block_api.asm</a></li>
-<li><a href="https://www.amazon.com/Shellcoders-Handbook-Discovering-Exploiting-Security/dp/047008023X" target="_blank" rel="external">The Shellcoder’s Handbook: Discovering and Exploiting Security Holes</a></li>
-<li><a href="https://www.amazon.com/Sockets-Shellcode-Porting-Coding-Professionals/dp/1597490059" target="_blank" rel="external">Sockets，Shellcode，Porting，and Coding: Reverse Engineering Exploits and Tool Coding for Security Professionals</a></li>
+<li><a href="https://msdn.microsoft.com/en-us/library/ms809762.aspx" target="_blank" rel="noopener">https://msdn.microsoft.com/en-us/library/ms809762.aspx</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Process_Environment_Block" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Process_Environment_Block</a></li>
+<li><a href="https://support.microsoft.com/en-us/help/875352/a-detailed-description-of-the-data-execution-prevention-dep-feature-in-windows-xp-service-pack-2,-windows-xp-tablet-pc-edition-2005,-and-windows-server-2003" target="_blank" rel="noopener">https://support.microsoft.com/en-us/help/875352/a-detailed-description-of-the-data-execution-prevention-dep-feature-in-windows-xp-service-pack-2,-windows-xp-tablet-pc-edition-2005,-and-windows-server-2003</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Portable_Executable" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Portable_Executable</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Address_space_layout_randomization" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Address_space_layout_randomization</a></li>
+<li><a href="https://en.wikipedia.org/wiki/X86_calling_conventions" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/X86_calling_conventions</a></li>
+<li><a href="http://www.vividmachines.com/shellcode/shellcode.html" target="_blank" rel="noopener">http://www.vividmachines.com/shellcode/shellcode.html</a></li>
+<li><a href="https://github.com/secretsquirrel/fido" target="_blank" rel="noopener">https://github.com/secretsquirrel/fido</a></li>
+<li><a href="https://github.com/rapid7/metasploit-framework/blob/master/external/source/shellcode/windows/x86/src/block/block_api.asm" target="_blank" rel="noopener">https://github.com/rapid7/metasploit-framework/blob/master/external/source/shellcode/windows/x86/src/block/block_api.asm</a></li>
+<li><a href="https://www.amazon.com/Shellcoders-Handbook-Discovering-Exploiting-Security/dp/047008023X" target="_blank" rel="noopener">The Shellcoder’s Handbook: Discovering and Exploiting Security Holes</a></li>
+<li><a href="https://www.amazon.com/Sockets-Shellcode-Porting-Coding-Professionals/dp/1597490059" target="_blank" rel="noopener">Sockets，Shellcode，Porting，and Coding: Reverse Engineering Exploits and Tool Coding for Security Professionals</a></li>
 </ul>
 <h2 id="10-译者参考"><a href="#10-译者参考" class="headerlink" title="10. 译者参考"></a>10. 译者参考</h2><ul>
-<li><a href="https://support.microsoft.com/zh-cn/help/2458544/the-enhanced-mitigation-experience-toolkit" target="_blank" rel="external">https://support.microsoft.com/zh-cn/help/2458544/the-enhanced-mitigation-experience-toolkit</a></li>
+<li><a href="https://support.microsoft.com/zh-cn/help/2458544/the-enhanced-mitigation-experience-toolkit" target="_blank" rel="noopener">https://support.microsoft.com/zh-cn/help/2458544/the-enhanced-mitigation-experience-toolkit</a></li>
 </ul>
 
             </article>

@@ -61,9 +61,9 @@
             <article class="article-content markdown-body">
                 <p>由于一直在做 Web 漏洞扫描器的开发, 那么就必然少不了 Web 的漏洞测试环境, 其中就包括 bWAPP、DVWA、OWASP WebGoat 等这些国际品牌。</p>
 <p>这些漏洞环境一般搭建比较繁琐, 而且出问题后有不能像 <code>git</code> 那样方便的’回滚’操作, 当然你可以使用 <code>esxi</code> 来管理, 不过虚拟机仍然会存在定期快照、回滚操作较长等繁重操作。</p>
-<p>那有没有轻量级的能够快速搭建 Web 漏洞的测试环境呢? 答案是有的, 那就是 <code>docker</code>! 接下来我们就使用 <code>docker</code> 进行环境搭建。这里所涉及的项目已经创建在了 <code>github</code>(<a href="https://github.com/MyKings/docker-vulnerability-environment" target="_blank" rel="external">docker-vulnerability-environment</a>)上。</p>
+<p>那有没有轻量级的能够快速搭建 Web 漏洞的测试环境呢? 答案是有的, 那就是 <code>docker</code>! 接下来我们就使用 <code>docker</code> 进行环境搭建。这里所涉及的项目已经创建在了 <code>github</code>(<a href="https://github.com/MyKings/docker-vulnerability-environment" target="_blank" rel="noopener">docker-vulnerability-environment</a>)上。</p>
 <a id="more"></a>
-<h2 id="1、Docker-基本命令"><a href="#1、Docker-基本命令" class="headerlink" title="1、Docker 基本命令"></a>1、Docker 基本命令</h2><p>这里不会过多去讲解 <code>docker</code>, 只会对常用命令进行简要说明。相关详细的使用请参考: <a href="https://docs.docker.com/" target="_blank" rel="external">官方文档</a>。</p>
+<h2 id="1、Docker-基本命令"><a href="#1、Docker-基本命令" class="headerlink" title="1、Docker 基本命令"></a>1、Docker 基本命令</h2><p>这里不会过多去讲解 <code>docker</code>, 只会对常用命令进行简要说明。相关详细的使用请参考: <a href="https://docs.docker.com/" target="_blank" rel="noopener">官方文档</a>。</p>
 <p>使用 <code>docker</code> 前, 需要先安装 <code>docker</code> 的环境, 这里假设环境已安装好。</p>
 <h3 id="1-1-基本"><a href="#1-1-基本" class="headerlink" title="1.1 基本"></a>1.1 基本</h3><ul>
 <li><p>docker info</p>
@@ -148,7 +148,7 @@
 <h3 id="2-5-WORKDIR"><a href="#2-5-WORKDIR" class="headerlink" title="2.5 WORKDIR"></a>2.5 WORKDIR</h3><p>切换容器内的当前工作目录, 如: <code>WORKDIR /home/lib/</code>。 当你登陆到容器内后,默认就进入 <code>/home/lib</code> 目录。</p>
 <h3 id="2-6-EXPOSE"><a href="#2-6-EXPOSE" class="headerlink" title="2.6 EXPOSE"></a>2.6 EXPOSE</h3><p>暴漏端口, 把容器端口暴漏给宿主机, 方便在宿主机访问, 如:<code>EXPOSE 1000</code> 。</p>
 <h3 id="2-7-CMD"><a href="#2-7-CMD" class="headerlink" title="2.7 CMD"></a>2.7 CMD</h3><p>执行一系列命令, 如: <code>CMD [&quot;sh&quot;, &quot;./startup.sh&quot;]</code>。</p>
-<h3 id="2-8-Dockerfile-样例"><a href="#2-8-Dockerfile-样例" class="headerlink" title="2.8 Dockerfile 样例"></a>2.8 Dockerfile 样例</h3><p>github地址: <a href="https://github.com/MyKings/docker-vulnerability-environment/blob/master/bWAPP/Dockerfile" target="_blank" rel="external">https://github.com/MyKings/docker-vulnerability-environment/blob/master/bWAPP/Dockerfile</a></p>
+<h3 id="2-8-Dockerfile-样例"><a href="#2-8-Dockerfile-样例" class="headerlink" title="2.8 Dockerfile 样例"></a>2.8 Dockerfile 样例</h3><p>github地址: <a href="https://github.com/MyKings/docker-vulnerability-environment/blob/master/bWAPP/Dockerfile" target="_blank" rel="noopener">https://github.com/MyKings/docker-vulnerability-environment/blob/master/bWAPP/Dockerfile</a></p>
 <pre><code class="hljs python">FROM ubuntu:14.04
 
 MAINTAINER MyKings <xsseroot@gmail.com>
@@ -204,10 +204,10 @@ $ cd ./docker-vulnerability-environment/bWAPP
 <h3 id="3-4-开始测试"><a href="#3-4-开始测试" class="headerlink" title="3.4 开始测试"></a>3.4 开始测试</h3><p>使用浏览器打开 <code>http://127.0.0.1:8080/bWAPP/</code> 地址开始你的 Hack 之旅吧!</p>
 <p><img src="/images/bwapp/bwapp.jpg" alt=""></p>
 <h2 id="4、线上漏洞环境"><a href="#4、线上漏洞环境" class="headerlink" title="4、线上漏洞环境"></a>4、线上漏洞环境</h2><ul>
-<li><a href="https://www.hackthissite.org/" target="_blank" rel="external">https://www.hackthissite.org/</a></li>
-<li><a href="http://testfire.net/" target="_blank" rel="external">http://testfire.net/</a></li>
-<li><a href="http://testphp.vulnweb.com/" target="_blank" rel="external">http://testphp.vulnweb.com/</a></li>
-<li><a href="http://testasp.vulnweb.com/" target="_blank" rel="external">http://testasp.vulnweb.com/</a></li>
+<li><a href="https://www.hackthissite.org/" target="_blank" rel="noopener">https://www.hackthissite.org/</a></li>
+<li><a href="http://testfire.net/" target="_blank" rel="noopener">http://testfire.net/</a></li>
+<li><a href="http://testphp.vulnweb.com/" target="_blank" rel="noopener">http://testphp.vulnweb.com/</a></li>
+<li><a href="http://testasp.vulnweb.com/" target="_blank" rel="noopener">http://testasp.vulnweb.com/</a></li>
 </ul>
 
             </article>
